@@ -583,3 +583,30 @@ if (typeof $ !== 'undefined') {
     }
   });
 }
+
+
+// SweetAlert2 Toast Configürasyonu
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000,
+    padding: '0.5rem',
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+    }
+});
+
+/**
+ * Global Fire Fonksiyonu
+ * @param {string} icon - 'success', 'error', 'warning', 'info', 'question'
+ * @param {string} title - Gösterilecek mesaj
+ */
+window.fire = function(icon, title) {
+    Toast.fire({
+        icon: icon,
+        title: title
+    });
+};
