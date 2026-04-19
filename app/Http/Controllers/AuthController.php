@@ -23,7 +23,7 @@ class AuthController extends Controller
     }
 
     public function confirm_login(Request $request){
-        // Giriş alanlarını kontrol et
+        // 1. Temel giriş kontrolleri
         if (empty($request->email) || empty($request->password)) {
             return response()->json(["type" => "warning", "message" => "E-posta ve şifre girin!"]);
         }
@@ -32,42 +32,76 @@ class AuthController extends Controller
             return response()->json(["type" => "warning", "message" => "Geçerli bir e-posta girin!"]);
         }
 
-        // "remember" parametresini sildik, sadece email ve password alıyoruz
-        $credentials = $request->only('email', 'password');
+        // Kullanıcıyı manuel bulalım (Status kontrolü için önce giriş yapmadan bakıyoruz)
+        $user = \App\Models\User::where('email', $request->email)->first();
 
-        // attempt fonksiyonundaki ikinci parametreyi false yaparak kalıcı oturumu kapattık
-        if (auth()->attempt($credentials, false)) {
-        $user = auth()->user();
-        $agent = new Agent();
-
-        $deviceType = 'Desktop';
-        if ($agent->isTablet()) {
-            $deviceType = 'Tablet';
-        } elseif ($agent->isMobile()) {
-            $deviceType = 'Mobile';
+        if (!$user) {
+            return response()->json(["type" => "error", "message" => "Kullanıcı bulunamadı!"]);
         }
 
-        \App\Models\ActiveSession::create([
-            'user_id'    => $user->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'device'     => $deviceType,         
-            'platform'   => $agent->platform(),        
-            'browser'    => $agent->browser(),        
-        ]);
+        // 2. Status Kontrolü (0 ise giriş yasak)
+        if ($user->status == 0) {
+            return response()->json(["type" => "error", "message" => "Hesabınız pasif durumdadır. Lütfen yöneticiyle iletişime geçin."]);
+        }
 
-        \App\Models\LastLogin::create([
-            'user_id'    => $user->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'device'     => $deviceType,         
-            'platform'   => $agent->platform(),        
-            'browser'    => $agent->browser(),        
-        ]);
+        // 3. Kimlik Doğrulama
+        $credentials = $request->only('email', 'password');
+        if (auth()->attempt($credentials, false)) {
+            
+            $agent = new Agent();
+            $deviceType = $agent->isTablet() ? 'Tablet' : ($agent->isMobile() ? 'Mobile' : 'Desktop');
+            
+            $currentIp = $request->ip();
+            $currentBrowser = $agent->browser();
+            $currentPlatform = $agent->platform();
+
+            // 4. Aktif Oturum ve Last Login Kontrolü
+            // Hem ActiveSession hem de LastLogin (çıkış yapılmamış olanlar) için kontrol
+            $existingSession = \App\Models\ActiveSession::where('user_id', $user->id)->first();
+            
+            if ($existingSession) {
+                // Cihaz/Tarayıcı/IP bilgilerinden biri bile farklı mı?
+                if ($existingSession->ip_address !== $currentIp || 
+                    $existingSession->browser !== $currentBrowser || 
+                    $existingSession->platform !== $currentPlatform) {
+                    
+                    auth()->logout(); // Girişi iptal et
+                    return response()->json([
+                        "type" => "error", 
+                        "message" => "Farklı bir cihazda aktif oturumunuz bulunuyor. Önce oradan çıkış yapmalısınız."
+                    ]);
+                } else {
+                    // Cihaz aynı ise eski kayıtları temizle (Yenisi açılacak)
+                    \App\Models\ActiveSession::where('user_id', $user->id)->delete();
+                    // LastLogin'de açık kalan (ended_at null olan) aynı cihaz oturumlarını da kapatabilirsin
+                    \App\Models\LastLogin::where('user_id', $user->id)
+                        ->whereNull('ended_at')
+                        ->update(['ended_at' => now()]);
+                }
+            }
+
+            // 5. Yeni Oturum Kayıtlarını Oluştur
+            \App\Models\ActiveSession::create([
+                'user_id'    => $user->id,
+                'ip_address' => $currentIp,
+                'user_agent' => $request->userAgent(),
+                'device'     => $deviceType,         
+                'platform'   => $currentPlatform,        
+                'browser'    => $currentBrowser,        
+            ]);
+
+            \App\Models\LastLogin::create([
+                'user_id'    => $user->id,
+                'ip_address' => $currentIp,
+                'user_agent' => $request->userAgent(),
+                'device'     => $deviceType,         
+                'platform'   => $currentPlatform,        
+                'browser'    => $currentBrowser,
+                'login_at'   => now(),
+            ]);
 
             $welcomeMessage = "Hoş geldin, " . $user->firstname . "!";
 
-            // İlk giriş mi yoksa normal giriş mi kontrolü
             if ($user->is_first_login == 1) {
                 return response()->json([
                     "type" => "success", 
@@ -83,10 +117,6 @@ class AuthController extends Controller
             ]);
         }
 
-        // Kimlik doğrulama başarısız
-        return response()->json([
-            "type" => "error", 
-            "message" => "E-posta veya şifre hatalı!"
-        ]);
+        return response()->json(["type" => "error", "message" => "E-posta veya şifre hatalı!"]);
     }
 }
