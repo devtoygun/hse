@@ -67,12 +67,12 @@
             <form method="POST" action="{{ route('auth.store-login') }}" class="mb-6">
                 @csrf
 
-                <div class="mb-6">
+                <div class="mb-3">
                     <label class="form-label" for="email">E-posta</label>
                     <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autofocus>
                 </div>
 
-                <div class="mb-6 form-password-toggle">
+                <div class="mb-3 form-password-toggle">
                     <div class="d-flex justify-content-between">
                         <label class="form-label" for="password">Sifre</label>
                         <a href="{{ route('auth.reset-password') }}">
