@@ -64,12 +64,12 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('auth.store-login') }}" class="mb-6">
+            <form method="POST" action="javascript:;" class="mb-6">
                 @csrf
 
                 <div class="mb-3">
                     <label class="form-label" for="email">E-posta</label>
-                    <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autofocus>
+                    <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}"  autofocus>
                 </div>
 
                 <div class="mb-3 form-password-toggle">
@@ -80,13 +80,24 @@
                         </a>
                     </div>
                     <div class="input-group input-group-merge">
-                        <input id="password" type="password" class="form-control" name="password" required>
+                        <input id="password" type="password" class="form-control" name="password" >
                         <span class="input-group-text cursor-pointer"><i class="ti ti-eye-off"></i></span>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary d-grid w-100">Giris Yap</button>
+                <button onclick="login()" class="btn btn-primary d-grid w-100">Giris Yap</button>
             </form>
         </div>
     </div>
+@endsection
+
+@section('script')
+<script>
+    function login(){
+        var email = $("#email").val();
+        var pass  = $("#password").val();
+        
+        fastpost("/auth/login", {email:email,password:pass}, "/");
+    }
+</script>
 @endsection

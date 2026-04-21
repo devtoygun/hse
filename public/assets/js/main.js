@@ -4,6 +4,72 @@
 
 'use strict';
 
+
+// assets/js/main.js
+
+window.fastpost = function (url, data = {}, redirect = null) {
+    // Axios ile POST isteği gönder [cite: 2]
+    axios.post(url, data)
+        .then((response) => {
+            const res = response.data;
+
+            // İstediğin özel Toast konfigürasyonu [cite: 5]
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+
+            // Mesaj belirleme mantığı
+            let displayMessage = res.message || (res.status ? "İşlem başarılı" : "Bir hata oluştu");
+
+            // Eğer errors varsa sadece İLK hatayı al
+            if (res.errors) {
+                const firstErrorKey = Object.keys(res.errors)[0]; // Örn: "email"
+                displayMessage = res.errors[firstErrorKey][0];   // Örn: "validation.required"
+            }
+
+            Toast.fire({
+                icon: res.status ? "success" : "error",
+                title: displayMessage // Tek satır olduğu için title kullanabiliriz
+            });
+
+            if (res.status) {
+                setTimeout(() => {
+                    if (redirect) { window.location.href = redirect; } 
+                    else { window.location.reload(); }
+                }, 500);
+            }
+        })
+        .catch((error) => {
+            let errorText = "Bağlantı hatası!";
+            
+            // Catch bloğuna düşen (422 vb) hatalarda da ilk hatayı yakala
+            if (error.response && error.response.data && error.response.data.errors) {
+                const firstKey = Object.keys(error.response.data.errors)[0];
+                errorText = error.response.data.errors[firstKey][0];
+            }
+
+            Swal.fire({
+                icon: "error",
+                title: errorText,
+                toast: true,
+                position: "top-end",
+                timer: 3000,
+                showConfirmButton: false
+            });
+            });
+};
+
+
+
+
 let isRtl = window.Helpers.isRtl(),
   isDarkStyle = window.Helpers.isDarkStyle(),
   menu,
@@ -585,55 +651,5 @@ if (typeof $ !== 'undefined') {
 }
 
 
+console.log("main.js yüklendi!");
 
-
-
-
-
-window.fastpost = function (url, data = {}, redirect = null) {
-  axios.post(url, data)
-    .then((response) => {
-      const res = response.data;
-
-      // SweetAlert Toast Yapılandırması
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      });
-
-      // Gelen cevaba göre toast gösterimi
-      Toast.fire({
-        icon: res.type,
-        title: res.message || (res.status ? "İşlem başarılı" : "Bir hata oluştu")
-      });
-
-      // Eğer status true ise yönlendirme veya yenileme yap
-      if (res.status) {
-        setTimeout(() => {
-          if (redirect) {
-            window.location.href = redirect;
-          } else {
-            window.location.reload();
-          }
-        }, 500);
-      }
-    })
-    .catch((error) => {
-      console.error("FastPost Error:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Sistemsel bir hata oluştu!",
-        toast: true,
-        position: "top-end",
-        timer: 3000,
-        showConfirmButton: false
-      });
-    });
-};
