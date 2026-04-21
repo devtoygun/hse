@@ -583,3 +583,57 @@ if (typeof $ !== 'undefined') {
     }
   });
 }
+
+
+
+
+
+
+
+window.fastpost = function (url, data = {}, redirect = null) {
+  axios.post(url, data)
+    .then((response) => {
+      const res = response.data;
+
+      // SweetAlert Toast Yapılandırması
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        }
+      });
+
+      // Gelen cevaba göre toast gösterimi
+      Toast.fire({
+        icon: res.type,
+        title: res.message || (res.status ? "İşlem başarılı" : "Bir hata oluştu")
+      });
+
+      // Eğer status true ise yönlendirme veya yenileme yap
+      if (res.status) {
+        setTimeout(() => {
+          if (redirect) {
+            window.location.href = redirect;
+          } else {
+            window.location.reload();
+          }
+        }, 500);
+      }
+    })
+    .catch((error) => {
+      console.error("FastPost Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Sistemsel bir hata oluştu!",
+        toast: true,
+        position: "top-end",
+        timer: 3000,
+        showConfirmButton: false
+      });
+    });
+};
