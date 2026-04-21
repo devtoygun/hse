@@ -19,8 +19,8 @@ class AuthService
     public function getLoginViewData(): array
     {
         return [
-            'title' => 'Login',
-            'description' => 'Sign in to continue to the application.',
+            'title' => 'Giris Yap',
+            'description' => 'Uygulamaya devam etmek icin hesabiniza giris yapin.',
         ];
     }
 
