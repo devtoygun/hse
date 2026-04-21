@@ -1,0 +1,162 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+
+class AuthService
+{
+    public function __construct(
+        private readonly ActiveSessionService $activeSessionService
+    ) {
+    }
+
+    public function getLoginViewData(): array
+    {
+        return [
+            'title' => 'Login',
+            'description' => 'Sign in to continue to the application.',
+        ];
+    }
+
+    public function getRegisterViewData(): array
+    {
+        return [
+            'title' => 'Register',
+            'description' => 'Create a new account to access the application.',
+        ];
+    }
+
+    public function getResetPasswordViewData(): array
+    {
+        return [
+            'title' => 'Reset Password',
+            'description' => 'We will send a password reset link to your email address.',
+        ];
+    }
+
+    public function login(Request $request, array $credentials): RedirectResponse
+    {
+        $user = User::query()
+            ->where('email', $credentials['email'])
+            ->first();
+
+        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+            $this->activeSessionService->recordAuditLog(
+                $user,
+                'Login denied because the provided credentials did not match.',
+                'auth.login.invalid_credentials'
+            );
+
+            return back()
+                ->withErrors([
+                    'email' => 'The provided credentials do not match our records.',
+                ])
+                ->onlyInput('email');
+        }
+
+        if (strtolower((string) $user->status) !== 'active') {
+            $this->activeSessionService->recordAuditLog(
+                $user,
+                'Login denied because the account status is not active.',
+                'auth.login.inactive_user'
+            );
+
+            return back()
+                ->withErrors([
+                    'email' => 'Your account is not active right now.',
+                ])
+                ->onlyInput('email');
+        }
+
+        if ($this->activeSessionService->hasConflictingSession($user, $request)) {
+            $this->activeSessionService->recordAuditLog(
+                $user,
+                'Login denied because another active session exists on a different device.',
+                'auth.login.device_conflict'
+            );
+
+            return back()
+                ->withErrors([
+                    'email' => 'You already have an active session on a different device.',
+                ])
+                ->onlyInput('email');
+        }
+
+        Auth::login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
+        $this->activeSessionService->startSession($user, $request);
+        $this->activeSessionService->recordAuditLog(
+            $user,
+            'Login completed successfully.',
+            'auth.login.success'
+        );
+
+        return redirect()->route('app.index');
+    }
+
+    public function logout(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        if ($user) {
+            $this->activeSessionService->endSession($user, $request);
+            $this->activeSessionService->recordAuditLog(
+                $user,
+                'Logout completed successfully.',
+                'auth.logout.success'
+            );
+        }
+
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('auth.login');
+    }
+
+    public function register(Request $request, array $payload): RedirectResponse
+    {
+        $user = User::query()->create([
+            'firstname' => $payload['firstname'],
+            'lastname' => $payload['lastname'],
+            'email' => $payload['email'],
+            'phone' => $payload['phone'] ?? null,
+            'status' => 'active',
+            'password' => $payload['password'],
+        ]);
+
+        Auth::login($user);
+        $request->session()->regenerate();
+        $this->activeSessionService->startSession($user, $request);
+        $this->activeSessionService->recordAuditLog(
+            $user,
+            'User registered and an authenticated session was started.',
+            'auth.register.success'
+        );
+
+        return redirect()->route('app.index');
+    }
+
+    public function sendResetLink(array $payload): RedirectResponse
+    {
+        $status = Password::sendResetLink([
+            'email' => $payload['email'],
+        ]);
+
+        if ($status !== Password::RESET_LINK_SENT) {
+            return back()
+                ->withErrors([
+                    'email' => __($status),
+                ])
+                ->onlyInput('email');
+        }
+
+        return back()->with('status', __($status));
+    }
+}
