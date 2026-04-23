@@ -296,12 +296,14 @@ if (document.getElementById('layout-menu')) {
   // ---------------------------------------
 
   if (typeof i18next !== 'undefined' && typeof i18NextHttpBackend !== 'undefined') {
+    const currentLocale = document.documentElement.lang?.split('-')[0] || 'en';
+
     i18next
       .use(i18NextHttpBackend)
       .init({
-        lng: 'en',
+        lng: currentLocale,
         debug: false,
-        fallbackLng: 'en',
+        fallbackLng: currentLocale,
         backend: {
           loadPath: assetsPath + 'json/locales/{{lng}}.json'
         },
@@ -339,11 +341,20 @@ if (document.getElementById('layout-menu')) {
 
   function localize() {
     let i18nList = document.querySelectorAll('[data-i18n]');
-    // Set the current language in dd
     let currentLanguageEle = document.querySelector('.dropdown-item[data-language="' + i18next.language + '"]');
 
     if (currentLanguageEle) {
-      currentLanguageEle.click();
+      let selectedLangFlag = currentLanguageEle.querySelector('.fi').getAttribute('class');
+
+      currentLanguageEle.parentElement.querySelectorAll('.dropdown-item').forEach(function (item) {
+        item.classList.remove('selected');
+      });
+
+      currentLanguageEle.classList.add('selected');
+
+      if (languageDropdown.length) {
+        languageDropdown[0].querySelector('.dropdown-toggle .fi').className = selectedLangFlag;
+      }
     }
 
     i18nList.forEach(function (item) {
