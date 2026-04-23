@@ -17,7 +17,7 @@
 
         <ul class="navbar-nav flex-row align-items-center ms-auto">
             <li class="nav-item dropdown-language dropdown me-2 me-xl-0">
-                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" aria-label="{{ __('ui.language') }}">
+                <a class="nav-link hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" aria-label="{{ __('ui.language') }}">
                     @if (app()->getLocale() === 'tr')
                         <i class="fi fi-tr fis rounded-circle fs-3"></i>
                     @else
@@ -47,7 +47,7 @@
             </li>
 
             <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                <a class="nav-link dropdown-toggle hide-arrow d-flex align-items-center gap-2" href="javascript:void(0);" data-bs-toggle="dropdown">
+                <a class="nav-link hide-arrow d-flex align-items-center gap-2" href="javascript:void(0);" data-bs-toggle="dropdown">
                     <div class="avatar avatar-online">
                         <img src="{{ asset('assets/img/avatars/1.png') }}" alt="{{ auth()->user()->firstname }}" class="h-auto rounded-circle" />
                     </div>
