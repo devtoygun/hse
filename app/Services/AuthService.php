@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,7 +41,7 @@ class AuthService
         ];
     }
 
-    public function login(Request $request, array $credentials): RedirectResponse
+    public function login(Request $request, array $credentials): RedirectResponse|JsonResponse
     {
         $user = User::query()
             ->where('email', $credentials['email'])
@@ -53,10 +54,17 @@ class AuthService
                 'auth.login.invalid_credentials'
             );
 
+            $message = 'E-posta veya sifre hatali.';
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $message,
+                ], 422);
+            }
+
             return back()
-                ->withErrors([
-                    'email' => 'The provided credentials do not match our records.',
-                ])
+                ->withErrors(['email' => $message])
                 ->onlyInput('email');
         }
 
@@ -67,10 +75,17 @@ class AuthService
                 'auth.login.inactive_user'
             );
 
+            $message = 'Hesabiniz su anda aktif degil.';
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $message,
+                ], 403);
+            }
+
             return back()
-                ->withErrors([
-                    'email' => 'Your account is not active right now.',
-                ])
+                ->withErrors(['email' => $message])
                 ->onlyInput('email');
         }
 
@@ -81,10 +96,17 @@ class AuthService
                 'auth.login.device_conflict'
             );
 
+            $message = 'Baska bir cihazda aktif oturumunuz bulunuyor.';
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $message,
+                ], 409);
+            }
+
             return back()
-                ->withErrors([
-                    'email' => 'You already have an active session on a different device.',
-                ])
+                ->withErrors(['email' => $message])
                 ->onlyInput('email');
         }
 
@@ -96,6 +118,13 @@ class AuthService
             'Login completed successfully.',
             'auth.login.success'
         );
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Giris basarili.',
+            ]);
+        }
 
         return redirect()->route('app.index');
     }

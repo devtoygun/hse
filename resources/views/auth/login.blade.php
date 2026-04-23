@@ -58,9 +58,7 @@
 
             @if ($errors->any())
                 <div class="alert alert-danger">
-                    @foreach ($errors->all() as $error)
-                        <div>{{ $error }}</div>
-                    @endforeach
+                    <div>{{ $errors->first() }}</div>
                 </div>
             @endif
 
@@ -85,7 +83,7 @@
                     </div>
                 </div>
 
-                <button onclick="login()" class="btn btn-primary d-grid w-100">Giris Yap</button>
+                <button type="button" onclick="login(event)" class="btn btn-primary d-grid w-100">Giris Yap</button>
             </form>
         </div>
     </div>
@@ -93,11 +91,30 @@
 
 @section('script')
 <script>
-    function login(){
-        var email = $("#email").val();
-        var pass  = $("#password").val();
-        
-        fastpost("/auth/login", {email:email,password:pass}, "/");
+    function login(e){
+        if (e && typeof e.preventDefault === 'function') e.preventDefault();
+
+        var email = ($("#email").val() || "").trim();
+        var pass  = ($("#password").val() || "");
+
+        if (!email) {
+            Swal.fire({ icon: "error", title: "E-posta zorunludur.", toast: true, position: "top-end", timer: 3000, showConfirmButton: false });
+            return;
+        }
+
+        // Basic email sanity check before posting.
+        var emailOk = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
+        if (!emailOk) {
+            Swal.fire({ icon: "error", title: "Lutfen gecerli bir e-posta adresi giriniz.", toast: true, position: "top-end", timer: 3000, showConfirmButton: false });
+            return;
+        }
+
+        if (!pass) {
+            Swal.fire({ icon: "error", title: "Sifre zorunludur.", toast: true, position: "top-end", timer: 3000, showConfirmButton: false });
+            return;
+        }
+
+        fastpost("/auth/login", {email: email, password: pass}, "/");
     }
 </script>
 @endsection

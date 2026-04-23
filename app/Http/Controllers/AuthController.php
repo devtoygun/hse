@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\AuthService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -19,11 +20,15 @@ class AuthController extends Controller
         return view('auth.login', $this->authService->getLoginViewData());
     }
 
-    public function storeLogin(Request $request): RedirectResponse
+    public function storeLogin(Request $request): RedirectResponse|JsonResponse
     {
         $payload = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
+        ], [
+            'email.required' => 'E-posta zorunludur.',
+            'email.email' => 'Lutfen gecerli bir e-posta adresi giriniz.',
+            'password.required' => 'Sifre zorunludur.',
         ]);
 
         return $this->authService->login($request, $payload);
