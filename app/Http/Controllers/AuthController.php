@@ -70,4 +70,56 @@ class AuthController extends Controller
 
         return $this->authService->sendResetLink($payload);
     }
+
+    public function sendResetCode(Request $request): JsonResponse
+    {
+        $payload = $request->validate([
+            'email' => ['required', 'email'],
+        ], [
+            'email.required' => 'E-posta zorunludur.',
+            'email.email' => 'Lutfen gecerli bir e-posta adresi giriniz.',
+        ]);
+
+        return $this->authService->sendResetCode($request, $payload);
+    }
+
+    public function verifyResetCode(Request $request): JsonResponse
+    {
+        $payload = $request->validate([
+            'email' => ['required', 'email'],
+            'otp' => ['required', 'digits:6'],
+        ], [
+            'email.required' => 'E-posta zorunludur.',
+            'email.email' => 'Lutfen gecerli bir e-posta adresi giriniz.',
+            'otp.required' => 'Kod zorunludur.',
+            'otp.digits' => 'Kod 6 haneli olmalidir.',
+        ]);
+
+        return $this->authService->verifyResetCode($request, $payload);
+    }
+
+    public function setNewPassword(Request $request): JsonResponse
+    {
+        $payload = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[^A-Za-z0-9]/',
+                'confirmed',
+            ],
+        ], [
+            'email.required' => 'E-posta zorunludur.',
+            'email.email' => 'Lutfen gecerli bir e-posta adresi giriniz.',
+            'password.required' => 'Sifre zorunludur.',
+            'password.min' => 'Sifre en az 6 karakter olmalidir.',
+            'password.regex' => 'Sifre; en az 1 buyuk harf, 1 kucuk harf ve 1 ozel karakter icermelidir.',
+            'password.confirmed' => 'Sifreler eslesmiyor.',
+        ]);
+
+        return $this->authService->setNewPassword($request, $payload);
+    }
 }

@@ -108,7 +108,7 @@ function fastpostFirstError(errors) {
 }
 
 window.fastpost = function (url, data = {}, redirect = null) {
-  axios
+  return axios
     .post(url, data)
     .then(response => {
       const res = response?.data ?? {};
@@ -127,12 +127,15 @@ window.fastpost = function (url, data = {}, redirect = null) {
       }
 
       if (res.status) {
-        setTimeout(() => {
-          const target = res.redirect || redirect;
-          if (target) window.location.href = target;
-          else window.location.reload();
-        }, 500);
+        const target = res.redirect || redirect;
+        if (target) {
+          setTimeout(() => {
+            window.location.href = target;
+          }, 500);
+        }
       }
+
+      return res;
     })
     .catch(error => {
       const data = error?.response?.data ?? {};
@@ -153,6 +156,8 @@ window.fastpost = function (url, data = {}, redirect = null) {
           showConfirmButton: false
         });
       }
+
+      return data;
     });
 };
 

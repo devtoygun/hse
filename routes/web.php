@@ -22,4 +22,7 @@ Route::controller(AuthController::class)
         Route::post('/register', 'storeRegister')->name('store-register');
         Route::get('/reset-password', 'resetPassword')->name('reset-password');
         Route::post('/reset-password', 'storeResetPassword')->name('store-reset-password');
+        Route::post('/send-reset-code', 'sendResetCode')->name('send-reset-code');
+        Route::post('/verify-reset-code', 'verifyResetCode')->name('verify-reset-code');
+        Route::post('/set-new-password', 'setNewPassword')->name('set-new-password');
     });

@@ -2,16 +2,21 @@
 
 namespace App\Services;
 
+use App\Mail\ResetCodeMail;
+use App\Models\ResetCode;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 
 class AuthService
 {
+    private const RESET_CODE_EXPIRES_MINUTES = 15;
+
     public function __construct(
         private readonly ActiveSessionService $activeSessionService
     ) {
@@ -36,8 +41,8 @@ class AuthService
     public function getResetPasswordViewData(): array
     {
         return [
-            'title' => 'Reset Password',
-            'description' => 'We will send a password reset link to your email address.',
+            'title' => 'Sifre Yenileme',
+            'description' => 'E-posta adresinize 6 haneli dogrulama kodu gonderecegiz.',
         ];
     }
 
@@ -120,7 +125,7 @@ class AuthService
         );
 
         $redirect = (int) $user->first_login === 1
-            ? route('auth.reset-password')
+            ? route('auth.reset-password') .'?email='.$credentials['email']
             : route('app.index');
 
         if ($request->expectsJson()) {
@@ -192,5 +197,144 @@ class AuthService
         }
 
         return back()->with('status', __($status));
+    }
+
+    public function sendResetCode(Request $request, array $payload): JsonResponse
+    {
+        $email = strtolower(trim((string) $payload['email']));
+        $user = User::query()->where('email', $email)->first();
+
+        if (! $user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Bu e-posta adresine ait kullanici bulunamadi.',
+            ], 404);
+        }
+
+        if ($request->user() && strtolower((string) $request->user()->email) !== $email) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Sadece kendi e-posta adresiniz icin kod isteyebilirsiniz.',
+            ], 403);
+        }
+
+        ResetCode::query()
+            ->where('email', $email)
+            ->where('status', 1)
+            ->update(['status' => 0]);
+
+        $code = (string) random_int(100000, 999999);
+        $expiresAt = now()->addMinutes(self::RESET_CODE_EXPIRES_MINUTES);
+
+        $resetCode = ResetCode::query()->create([
+            'email' => $email,
+            'code' => $code,
+            'status' => 1,
+            'expires_at' => $expiresAt,
+        ]);
+
+        $request->session()->put('password_reset.email', $email);
+        $request->session()->put('password_reset.code_id', $resetCode->id);
+        $request->session()->forget('password_reset.verified');
+
+        Mail::to($email)->send(new ResetCodeMail($code, self::RESET_CODE_EXPIRES_MINUTES));
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Dogrulama kodu e-posta adresinize gonderildi.',
+        ]);
+    }
+
+    public function verifyResetCode(Request $request, array $payload): JsonResponse
+    {
+        $email = strtolower(trim((string) $payload['email']));
+        $otp = (string) $payload['otp'];
+
+        $resetCode = ResetCode::query()
+            ->where('email', $email)
+            ->where('code', $otp)
+            ->where('status', 1)
+            ->where('expires_at', '>=', now())
+            ->orderByDesc('id')
+            ->first();
+
+        if (! $resetCode) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Kod gecersiz veya suresi dolmus.',
+            ], 422);
+        }
+
+        if ($request->user() && strtolower((string) $request->user()->email) !== $email) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Bu islem icin yetkiniz yok.',
+            ], 403);
+        }
+
+        $resetCode->forceFill(['status' => 2])->save();
+
+        $request->session()->put('password_reset.email', $email);
+        $request->session()->put('password_reset.code_id', $resetCode->id);
+        $request->session()->put('password_reset.verified', true);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Kod dogrulandi.',
+        ]);
+    }
+
+    public function setNewPassword(Request $request, array $payload): JsonResponse
+    {
+        $email = strtolower(trim((string) $payload['email']));
+
+        if ($request->user() && strtolower((string) $request->user()->email) !== $email) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Bu islem icin yetkiniz yok.',
+            ], 403);
+        }
+
+        $verified = (bool) $request->session()->get('password_reset.verified', false);
+        $codeId = (int) $request->session()->get('password_reset.code_id', 0);
+        $sessionEmail = (string) $request->session()->get('password_reset.email', '');
+
+        if (! $verified || $codeId <= 0 || strtolower($sessionEmail) !== $email) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Once dogrulama kodunu girmeniz gerekiyor.',
+            ], 422);
+        }
+
+        $resetCode = ResetCode::query()->where('id', $codeId)->first();
+        if (! $resetCode || strtolower((string) $resetCode->email) !== $email || (int) $resetCode->status !== 2) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Dogrulama adimi gecersiz. Lutfen tekrar kod isteyin.',
+            ], 422);
+        }
+
+        $user = User::query()->where('email', $email)->first();
+        if (! $user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Bu e-posta adresine ait kullanici bulunamadi.',
+            ], 404);
+        }
+
+        $user->forceFill([
+            'password' => $payload['password'],
+            'first_login' => 0,
+        ])->save();
+
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Sifreniz basariyla guncellendi. Tekrar giris yapin.',
+            'redirect' => route('auth.login'),
+        ]);
     }
 }
