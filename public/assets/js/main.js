@@ -70,6 +70,101 @@ window.fastpost = function (url, data = {}, redirect = null) {
 
 
 
+// fastpost override (fix encoding + CSRF + first-error UX)
+(function () {
+  if (typeof axios === 'undefined') return;
+
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+  if (csrfToken) {
+    axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
+  }
+
+  axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+  axios.defaults.headers.common['Accept'] = 'application/json';
+})();
+
+const FastpostToast =
+  typeof Swal !== 'undefined'
+    ? Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: toast => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        }
+      })
+    : null;
+
+function fastpostFirstError(errors) {
+  if (!errors || typeof errors !== 'object') return null;
+  const firstKey = Object.keys(errors)[0];
+  const value = errors[firstKey];
+  if (Array.isArray(value)) return value[0] ?? null;
+  if (typeof value === 'string') return value;
+  return null;
+}
+
+function fastpostNormalizeMessage(message) {
+  if (!message || typeof message !== 'string') return null;
+
+  // Fallback for cases where backend returns translation keys.
+  if (message === 'validation.required' || message === 'validate.required') return 'Bu alan zorunludur.';
+  if (message === 'validation.email' || message === 'validate.email') return 'Lutfen gecerli bir e-posta adresi giriniz.';
+
+  return message;
+}
+
+window.fastpost = function (url, data = {}, redirect = null) {
+  axios
+    .post(url, data)
+    .then(response => {
+      const res = response?.data ?? {};
+      const firstError = fastpostFirstError(res.errors);
+
+      const displayMessage =
+        fastpostNormalizeMessage(firstError) ??
+        fastpostNormalizeMessage(res.message) ??
+        (res.status ? 'Islem basarili.' : 'Bir hata olustu.');
+
+      if (FastpostToast) {
+        FastpostToast.fire({
+          icon: res.status ? 'success' : 'error',
+          title: displayMessage
+        });
+      }
+
+      if (res.status) {
+        setTimeout(() => {
+          if (redirect) window.location.href = redirect;
+          else window.location.reload();
+        }, 500);
+      }
+    })
+    .catch(error => {
+      const data = error?.response?.data ?? {};
+      const firstError = fastpostFirstError(data.errors);
+
+      const errorText =
+        fastpostNormalizeMessage(firstError) ??
+        fastpostNormalizeMessage(data.message) ??
+        'Baglanti hatasi!';
+
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'error',
+          title: errorText,
+          toast: true,
+          position: 'top-end',
+          timer: 3000,
+          showConfirmButton: false
+        });
+      }
+    });
+};
+
 let isRtl = window.Helpers.isRtl(),
   isDarkStyle = window.Helpers.isDarkStyle(),
   menu,
@@ -652,4 +747,3 @@ if (typeof $ !== 'undefined') {
 
 
 console.log("main.js yüklendi!");
-
