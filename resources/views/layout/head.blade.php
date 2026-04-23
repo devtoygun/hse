@@ -31,5 +31,10 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/formvalidation/dist/css/formValidation.min.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-auth.css') }}" />
 
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
+
+<script src="{{ asset('assets/vendor/js/template-customizer.js') }}"></script>
 <script src="{{ asset('assets/vendor/js/helpers.js') }}"></script>
 <script src="{{ asset('assets/js/config.js') }}"></script>

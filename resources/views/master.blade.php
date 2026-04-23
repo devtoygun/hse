@@ -32,5 +32,6 @@
 
         @include('layout.scripts')
         @stack('scripts')
+        @yield('script')
     </body>
 </html>

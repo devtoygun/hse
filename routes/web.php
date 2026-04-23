@@ -37,6 +37,8 @@ Route::middleware(['auth', EnsureActiveSessionExists::class, TrackActiveSessionA
             Route::get('/list-user', 'listUsers')->name('list-user');
             Route::get('/list-admin', 'listAdmins')->name('list-admin');
             Route::get('/new-user', 'create')->name('create');
+
+            Route::post('/change-password', 'change_password');
         });
 
     Route::controller(FacilityController::class)
