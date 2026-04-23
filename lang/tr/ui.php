@@ -1,0 +1,30 @@
+<?php
+
+return [
+    'dashboard' => 'Pano',
+    'forms' => 'Formlar',
+    'admin_settings' => 'Yonetici Ayarlari',
+    'form_archive' => 'Form Arsivi',
+    'form_management' => 'Form Yonetimi',
+    'new_form' => 'Yeni Form',
+    'new_subform' => 'Yeni Alt Form',
+    'form_attach' => 'Form Iliskilendir',
+    'all_forms' => 'Tum Formlar',
+    'user_management' => 'Kullanici Yonetimi',
+    'all_users' => 'Tum Kullanicilar',
+    'all_admins' => 'Tum Yoneticiler',
+    'new_user' => 'Yeni Kullanici',
+    'facility_management' => 'Tesis Yonetimi',
+    'all_facilities' => 'Tum Tesisler',
+    'all_units' => 'Tum Birimler',
+    'new_facility' => 'Yeni Tesis',
+    'new_unit' => 'Yeni Birim',
+    'search' => 'Ara',
+    'language' => 'Dil',
+    'theme' => 'Tema',
+    'dark_mode' => 'Karanlik mod',
+    'light_mode' => 'Aydinlik mod',
+    'turkish' => 'Turkce',
+    'english' => 'English',
+];
+

@@ -12,6 +12,8 @@
     </head>
 
     <body>
+        @include('layout.language-links')
+
         <div class="layout-wrapper layout-content-navbar">
             <div class="layout-container">
                 @include('layout.sidebar')

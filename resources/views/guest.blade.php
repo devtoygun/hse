@@ -12,6 +12,8 @@
     </head>
 
     <body>
+        @include('layout.language-links')
+
         <div class="authentication-wrapper authentication-cover authentication-bg">
             <div class="authentication-inner row m-0">
                 @yield('content')

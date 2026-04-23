@@ -11,120 +11,73 @@
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
-        <li class="menu-item text-white active">
-            <a href="{{ url('/') }}" class="menu-link active text-white">
+        <li class="menu-item active">
+            <a href="{{ url('/') }}" class="menu-link text-white">
                 <i class="menu-icon tf-icons ti ti-smart-home"></i>
-                <div>Pano</div>
+                <div>{{ __('ui.dashboard') }}</div>
             </a>
         </li>
 
-        <li class="menu-item text-white active">
-            <a href="{{ url('/form') }}" class="menu-link active text-white">
-                <i class="menu-icon tf-icons ti ti-smart-home"></i>
-                <div>Formlar</div>
+        <li class="menu-item">
+            <a href="{{ url('/form') }}" class="menu-link text-white">
+                <i class="menu-icon tf-icons ti ti-forms"></i>
+                <div>{{ __('ui.forms') }}</div>
             </a>
         </li>
 
         @isAdmin
             <li class="menu-header small text-uppercase">
-              <span class="menu-header-text">Yönetici Ayarları</span>
+                <span class="menu-header-text">{{ __('ui.admin_settings') }}</span>
             </li>
 
-        <li class="menu-item text-white active">
-            <a href="{{ url('/form/archive') }}" class="menu-link active text-white">
-                <i class="menu-icon tf-icons ti ti-smart-home"></i>
-                <div>Form Arşivi</div>
-            </a>
-        </li>
+            <li class="menu-item">
+                <a href="{{ url('/form/archive') }}" class="menu-link text-white">
+                    <i class="menu-icon tf-icons ti ti-archive"></i>
+                    <div>{{ __('ui.form_archive') }}</div>
+                </a>
+            </li>
 
-        <li class="menu-item ">
-            <a href="javascript:void(0);" class="menu-link menu-toggle text-muted">
-            <i class="menu-icon tf-icons ti ti-layout-sidebar"></i>
-            <div data-i18n="Layouts">Form Yönetimi</div>
-            </a>
+            <li class="menu-item">
+                <a href="javascript:void(0);" class="menu-link menu-toggle text-white">
+                    <i class="menu-icon tf-icons ti ti-layout-sidebar"></i>
+                    <div>{{ __('ui.form_management') }}</div>
+                </a>
 
-            <ul class="menu-sub">
-            <li class="menu-item">
-                <a href="/form/new-form" class="menu-link">
-                <div data-i18n="Collapsed menu">Yeni Form</div>
-                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item"><a href="/form/new-form" class="menu-link"><div>{{ __('ui.new_form') }}</div></a></li>
+                    <li class="menu-item"><a href="/form/new-subform" class="menu-link"><div>{{ __('ui.new_subform') }}</div></a></li>
+                    <li class="menu-item"><a href="/form/form-attachement" class="menu-link"><div>{{ __('ui.form_attach') }}</div></a></li>
+                    <li class="menu-item"><a href="/form/list" class="menu-link" target="_blank"><div>{{ __('ui.all_forms') }}</div></a></li>
+                </ul>
             </li>
-            <li class="menu-item">
-                <a href="/form/new-subform" class="menu-link">
-                <div data-i18n="Content navbar">Yeni Alt Form</div>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="/form/form-attachement" class="menu-link">
-                <div data-i18n="Content nav + Sidebar">Form İlişkilendir</div>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="/form/list" class="menu-link" target="_blank">
-                <div data-i18n="Horizontal">Tüm Formlar</div>
-                </a>
-            </li>
-            </ul>
-        </li>
 
-        <li class="menu-item ">
-            <a href="javascript:void(0);" class="menu-link menu-toggle text-muted">
-            <i class="menu-icon tf-icons ti ti-layout-sidebar"></i>
-            <div data-i18n="Layouts">Kullanıcı Yönetimi</div>
-            </a>
+            <li class="menu-item">
+                <a href="javascript:void(0);" class="menu-link menu-toggle text-white">
+                    <i class="menu-icon tf-icons ti ti-users"></i>
+                    <div>{{ __('ui.user_management') }}</div>
+                </a>
 
-            <ul class="menu-sub">
-            <li class="menu-item">
-                <a href="/user/list-user" class="menu-link">
-                <div data-i18n="Collapsed menu">Tüm Kullanıcılar</div>
-                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item"><a href="/user/list-user" class="menu-link"><div>{{ __('ui.all_users') }}</div></a></li>
+                    <li class="menu-item"><a href="/user/list-admin" class="menu-link"><div>{{ __('ui.all_admins') }}</div></a></li>
+                    <li class="menu-item"><a href="/user/new-user" class="menu-link"><div>{{ __('ui.new_user') }}</div></a></li>
+                </ul>
             </li>
-            <li class="menu-item">
-                <a href="/user/list-admin" class="menu-link">
-                <div data-i18n="Content navbar">Tüm Yöneticiler</div>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="/user/new-user" class="menu-link">
-                <div data-i18n="Content nav + Sidebar">Yeni Kullanıcı</div>
-                </a>
-            </li>
-           
-        </ul>
-        </li>
 
+            <li class="menu-item">
+                <a href="javascript:void(0);" class="menu-link menu-toggle text-white">
+                    <i class="menu-icon tf-icons ti ti-building-factory"></i>
+                    <div>{{ __('ui.facility_management') }}</div>
+                </a>
 
-        <li class="menu-item ">
-            <a href="javascript:void(0);" class="menu-link menu-toggle text-muted">
-            <i class="menu-icon tf-icons ti ti-layout-sidebar"></i>
-            <div data-i18n="Layouts">Tesis Yönetimi</div>
-            </a>
-
-            <ul class="menu-sub">
-            <li class="menu-item">
-                <a href="/facility/list-facility" class="menu-link">
-                <div data-i18n="Collapsed menu">Tüm Tesisler</div>
-                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item"><a href="/facility/list-facility" class="menu-link"><div>{{ __('ui.all_facilities') }}</div></a></li>
+                    <li class="menu-item"><a href="/facility/new-unit" class="menu-link"><div>{{ __('ui.all_units') }}</div></a></li>
+                    <li class="menu-item"><a href="/facility/new-facility" class="menu-link"><div>{{ __('ui.new_facility') }}</div></a></li>
+                    <li class="menu-item"><a href="/facility/new-unit" class="menu-link"><div>{{ __('ui.new_unit') }}</div></a></li>
+                </ul>
             </li>
-            <li class="menu-item">
-                <a href="/facility/new-unit" class="menu-link">
-                <div data-i18n="Content navbar">Tüm Birimler</div>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="/facility/new-facility" class="menu-link">
-                <div data-i18n="Content nav + Sidebar">Yeni Tesis</div>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="/facility/new-unit" class="menu-link">
-                <div data-i18n="Content nav + Sidebar">Yeni Birim</div>
-                </a>
-            </li>
-           
-        </ul>
-        </li>
-
         @endisAdmin
     </ul>
 </aside>
+

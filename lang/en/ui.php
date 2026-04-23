@@ -1,0 +1,30 @@
+<?php
+
+return [
+    'dashboard' => 'Dashboard',
+    'forms' => 'Forms',
+    'admin_settings' => 'Admin Settings',
+    'form_archive' => 'Form Archive',
+    'form_management' => 'Form Management',
+    'new_form' => 'New Form',
+    'new_subform' => 'New Subform',
+    'form_attach' => 'Attach Form',
+    'all_forms' => 'All Forms',
+    'user_management' => 'User Management',
+    'all_users' => 'All Users',
+    'all_admins' => 'All Admins',
+    'new_user' => 'New User',
+    'facility_management' => 'Facility Management',
+    'all_facilities' => 'All Facilities',
+    'all_units' => 'All Units',
+    'new_facility' => 'New Facility',
+    'new_unit' => 'New Unit',
+    'search' => 'Search',
+    'language' => 'Language',
+    'theme' => 'Theme',
+    'dark_mode' => 'Dark mode',
+    'light_mode' => 'Light mode',
+    'turkish' => 'Turkish',
+    'english' => 'English',
+];
+
