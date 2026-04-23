@@ -279,8 +279,30 @@ if (document.getElementById('layout-menu')) {
       switchImage('dark');
     }
   } else {
-    // Removed style switcher element if not using template customizer
-    styleSwitcherToggleEl.parentElement.remove();
+    const themeRoot = document.documentElement;
+    const savedTheme = localStorage.getItem('hse-theme-mode');
+    const applyTheme = style => {
+      themeRoot.classList.remove('light-style', 'dark-style');
+      themeRoot.classList.add(style === 'dark' ? 'dark-style' : 'light-style');
+      themeRoot.setAttribute('data-theme', 'theme-default');
+
+      if (styleSwitcherToggleEl) {
+        const icon = styleSwitcherToggleEl.querySelector('i');
+        icon.className = style === 'dark' ? 'ti ti-sun' : 'ti ti-moon-stars';
+        styleSwitcherToggleEl.setAttribute('title', style === 'dark' ? 'Light mode' : 'Dark mode');
+      }
+
+      switchImage(style);
+      localStorage.setItem('hse-theme-mode', style);
+    };
+
+    applyTheme(savedTheme === 'dark' ? 'dark' : 'light');
+
+    if (styleSwitcherToggleEl) {
+      styleSwitcherToggleEl.addEventListener('click', function () {
+        applyTheme(themeRoot.classList.contains('dark-style') ? 'light' : 'dark');
+      });
+    }
   }
 
   // Update light/dark image based on current style

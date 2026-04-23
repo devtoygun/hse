@@ -42,7 +42,7 @@
 
             <li class="nav-item me-2 me-xl-0">
                 <a class="nav-link style-switcher-toggle hide-arrow" href="javascript:void(0);" aria-label="{{ __('ui.theme') }}">
-                    <i class="ti ti-md"></i>
+                    <i class="ti ti-moon-stars"></i>
                 </a>
             </li>
 
@@ -107,4 +107,3 @@
         <i class="ti ti-x ti-sm search-toggler cursor-pointer"></i>
     </div>
 </nav>
-
