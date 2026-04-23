@@ -32,7 +32,9 @@
                     <input id="email" type="email" class="form-control" name="email" value="{{ request('email') }}" required autofocus>
                 </div>
 
-                <button type="button" onclick="sendCode(event)" class="btn btn-primary d-grid w-100">Kod Gonder</button>
+                <button id="sendCodeButton" type="button" onclick="sendCode(event)" class="btn btn-primary d-grid w-100">
+                    <span class="button-text">Kod Gonder</span>
+                </button>
             </form>
 
             <form id="twoStepsForm" class="mt-4 d-none" action="javascript:;" method="POST">
@@ -100,6 +102,20 @@
             return ($("#email").val() || "").trim().toLowerCase();
         }
 
+        function setSendCodeLoading(isLoading) {
+            var button = $("#sendCodeButton");
+            if (!button.length) return;
+
+            button.prop("disabled", isLoading);
+
+            if (isLoading) {
+                button.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span><span>Gonderiliyor...</span>');
+                return;
+            }
+
+            button.html('<span class="button-text">Kod Gonder</span>');
+        }
+
         function sendCode(e) {
             if (e && typeof e.preventDefault === "function") e.preventDefault();
 
@@ -112,12 +128,18 @@
                 return;
             }
 
-            return fastpost("/auth/send-reset-code", { email: email }).then(function (res) {
-                if (res && res.status) {
-                    showForm("#twoStepsForm");
-                    $("#twoStepsForm input[type='text']").first().focus();
-                }
-            });
+            setSendCodeLoading(true);
+
+            return fastpost("/auth/send-reset-code", { email: email })
+                .then(function (res) {
+                    if (res && res.status) {
+                        showForm("#twoStepsForm");
+                        $("#twoStepsForm input[type='text']").first().focus();
+                    }
+                })
+                .finally(function () {
+                    setSendCodeLoading(false);
+                });
         }
 
         function resendCode(e) {
@@ -201,4 +223,3 @@
         });
     </script>
 @endsection
-
