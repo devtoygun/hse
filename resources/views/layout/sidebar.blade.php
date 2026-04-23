@@ -7,7 +7,7 @@
     $isFacilityManagement = request()->routeIs('facility.list-facility') || request()->routeIs('facility.create-unit') || request()->routeIs('facility.create-facility');
 @endphp
 
-<aside id="layout-menu" class="layout-menu menu-vertical menu" style="background-color: #242745;">
+<aside id="layout-menu" class="layout-menu menu-vertical menu menu-dark" style="background-color: #242745;">
     <div class="app-brand demo">
         <a href="{{ url('/') }}" class="app-brand-link">
             <span class="app-brand-logo demo">
@@ -21,14 +21,14 @@
 
     <ul class="menu-inner py-1">
         <li class="menu-item {{ $isDashboard ? 'active' : '' }}">
-            <a href="{{ route('app.index') }}" class="menu-link text-white {{ $isDashboard ? 'active' : '' }}">
+            <a href="{{ route('app.index') }}" class="menu-link {{ $isDashboard ? 'active' : '' }}">
                 <i class="menu-icon tf-icons ti ti-smart-home"></i>
                 <div>{{ __('ui.dashboard') }}</div>
             </a>
         </li>
 
         <li class="menu-item {{ $isForms ? 'active' : '' }}">
-            <a href="{{ route('form.index') }}" class="menu-link text-white {{ $isForms ? 'active' : '' }}">
+            <a href="{{ route('form.index') }}" class="menu-link {{ $isForms ? 'active' : '' }}">
                 <i class="menu-icon tf-icons ti ti-forms"></i>
                 <div>{{ __('ui.forms') }}</div>
             </a>
@@ -40,14 +40,14 @@
             </li>
 
             <li class="menu-item {{ $isFormArchive ? 'active' : '' }}">
-                <a href="{{ route('form.archive') }}" class="menu-link text-white {{ $isFormArchive ? 'active' : '' }}">
+                <a href="{{ route('form.archive') }}" class="menu-link {{ $isFormArchive ? 'active' : '' }}">
                     <i class="menu-icon tf-icons ti ti-archive"></i>
                     <div>{{ __('ui.form_archive') }}</div>
                 </a>
             </li>
 
             <li class="menu-item {{ $isFormManagement ? 'active open' : '' }}">
-                <a href="javascript:void(0);" class="menu-link menu-toggle text-white {{ $isFormManagement ? 'active' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle {{ $isFormManagement ? 'active' : '' }}">
                     <i class="menu-icon tf-icons ti ti-layout-sidebar"></i>
                     <div>{{ __('ui.form_management') }}</div>
                 </a>
@@ -61,7 +61,7 @@
             </li>
 
             <li class="menu-item {{ $isUserManagement ? 'active open' : '' }}">
-                <a href="javascript:void(0);" class="menu-link menu-toggle text-white {{ $isUserManagement ? 'active' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle {{ $isUserManagement ? 'active' : '' }}">
                     <i class="menu-icon tf-icons ti ti-users"></i>
                     <div>{{ __('ui.user_management') }}</div>
                 </a>
@@ -74,7 +74,7 @@
             </li>
 
             <li class="menu-item {{ $isFacilityManagement ? 'active open' : '' }}">
-                <a href="javascript:void(0);" class="menu-link menu-toggle text-white {{ $isFacilityManagement ? 'active' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle {{ $isFacilityManagement ? 'active' : '' }}">
                     <i class="menu-icon tf-icons ti ti-building-factory"></i>
                     <div>{{ __('ui.facility_management') }}</div>
                 </a>
