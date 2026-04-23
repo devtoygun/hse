@@ -119,14 +119,19 @@ class AuthService
             'auth.login.success'
         );
 
+        $redirect = (int) $user->first_login === 1
+            ? route('auth.reset-password')
+            : route('app.index');
+
         if ($request->expectsJson()) {
             return response()->json([
                 'status' => true,
                 'message' => 'Giris basarili.',
+                'redirect' => $redirect,
             ]);
         }
 
-        return redirect()->route('app.index');
+        return redirect()->to($redirect);
     }
 
     public function logout(Request $request): RedirectResponse

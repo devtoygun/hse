@@ -107,16 +107,6 @@ function fastpostFirstError(errors) {
   return null;
 }
 
-function fastpostNormalizeMessage(message) {
-  if (!message || typeof message !== 'string') return null;
-
-  // Fallback for cases where backend returns translation keys.
-  if (message === 'validation.required' || message === 'validate.required') return 'Bu alan zorunludur.';
-  if (message === 'validation.email' || message === 'validate.email') return 'Lutfen gecerli bir e-posta adresi giriniz.';
-
-  return message;
-}
-
 window.fastpost = function (url, data = {}, redirect = null) {
   axios
     .post(url, data)
@@ -125,8 +115,8 @@ window.fastpost = function (url, data = {}, redirect = null) {
       const firstError = fastpostFirstError(res.errors);
 
       const displayMessage =
-        fastpostNormalizeMessage(firstError) ??
-        fastpostNormalizeMessage(res.message) ??
+        firstError ??
+        res.message ??
         (res.status ? 'Islem basarili.' : 'Bir hata olustu.');
 
       if (FastpostToast) {
@@ -138,7 +128,8 @@ window.fastpost = function (url, data = {}, redirect = null) {
 
       if (res.status) {
         setTimeout(() => {
-          if (redirect) window.location.href = redirect;
+          const target = res.redirect || redirect;
+          if (target) window.location.href = target;
           else window.location.reload();
         }, 500);
       }
@@ -148,8 +139,8 @@ window.fastpost = function (url, data = {}, redirect = null) {
       const firstError = fastpostFirstError(data.errors);
 
       const errorText =
-        fastpostNormalizeMessage(firstError) ??
-        fastpostNormalizeMessage(data.message) ??
+        firstError ??
+        data.message ??
         'Baglanti hatasi!';
 
       if (typeof Swal !== 'undefined') {

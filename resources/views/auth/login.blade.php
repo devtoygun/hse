@@ -103,7 +103,7 @@
         }
 
         // Basic email sanity check before posting.
-        var emailOk = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
+        var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         if (!emailOk) {
             Swal.fire({ icon: "error", title: "Lutfen gecerli bir e-posta adresi giriniz.", toast: true, position: "top-end", timer: 3000, showConfirmButton: false });
             return;
