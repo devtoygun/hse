@@ -1,11 +1,10 @@
 @php
-    $currentPath = request()->path();
     $isDashboard = request()->routeIs('app.index');
-    $isForms = request()->is('form');
-    $isFormArchive = request()->is('form/archive');
-    $isFormManagement = request()->is('form/new-form') || request()->is('form/new-subform') || request()->is('form/form-attachement') || request()->is('form/list');
-    $isUserManagement = request()->is('user/list-user') || request()->is('user/list-admin') || request()->is('user/new-user');
-    $isFacilityManagement = request()->is('facility/list-facility') || request()->is('facility/new-unit') || request()->is('facility/new-facility');
+    $isForms = request()->routeIs('form.index');
+    $isFormArchive = request()->routeIs('form.archive');
+    $isFormManagement = request()->routeIs('form.create') || request()->routeIs('form.create-subform') || request()->routeIs('form.attach') || request()->routeIs('form.list');
+    $isUserManagement = request()->routeIs('user.list-user') || request()->routeIs('user.list-admin') || request()->routeIs('user.create');
+    $isFacilityManagement = request()->routeIs('facility.list-facility') || request()->routeIs('facility.create-unit') || request()->routeIs('facility.create-facility');
 @endphp
 
 <aside id="layout-menu" class="layout-menu menu-vertical menu" style="background-color: #242745;">
@@ -22,14 +21,14 @@
 
     <ul class="menu-inner py-1">
         <li class="menu-item {{ $isDashboard ? 'active' : '' }}">
-            <a href="{{ url('/') }}" class="menu-link text-white {{ $isDashboard ? 'active' : '' }}">
+            <a href="{{ route('app.index') }}" class="menu-link text-white {{ $isDashboard ? 'active' : '' }}">
                 <i class="menu-icon tf-icons ti ti-smart-home"></i>
                 <div>{{ __('ui.dashboard') }}</div>
             </a>
         </li>
 
         <li class="menu-item {{ $isForms ? 'active' : '' }}">
-            <a href="{{ url('/form') }}" class="menu-link text-white {{ $isForms ? 'active' : '' }}">
+            <a href="{{ route('form.index') }}" class="menu-link text-white {{ $isForms ? 'active' : '' }}">
                 <i class="menu-icon tf-icons ti ti-forms"></i>
                 <div>{{ __('ui.forms') }}</div>
             </a>
@@ -41,7 +40,7 @@
             </li>
 
             <li class="menu-item {{ $isFormArchive ? 'active' : '' }}">
-                <a href="{{ url('/form/archive') }}" class="menu-link text-white {{ $isFormArchive ? 'active' : '' }}">
+                <a href="{{ route('form.archive') }}" class="menu-link text-white {{ $isFormArchive ? 'active' : '' }}">
                     <i class="menu-icon tf-icons ti ti-archive"></i>
                     <div>{{ __('ui.form_archive') }}</div>
                 </a>
@@ -54,10 +53,10 @@
                 </a>
 
                 <ul class="menu-sub">
-                    <li class="menu-item {{ request()->is('form/new-form') ? 'active' : '' }}"><a href="/form/new-form" class="menu-link {{ request()->is('form/new-form') ? 'active' : '' }}"><div>{{ __('ui.new_form') }}</div></a></li>
-                    <li class="menu-item {{ request()->is('form/new-subform') ? 'active' : '' }}"><a href="/form/new-subform" class="menu-link {{ request()->is('form/new-subform') ? 'active' : '' }}"><div>{{ __('ui.new_subform') }}</div></a></li>
-                    <li class="menu-item {{ request()->is('form/form-attachement') ? 'active' : '' }}"><a href="/form/form-attachement" class="menu-link {{ request()->is('form/form-attachement') ? 'active' : '' }}"><div>{{ __('ui.form_attach') }}</div></a></li>
-                    <li class="menu-item {{ request()->is('form/list') ? 'active' : '' }}"><a href="/form/list" class="menu-link {{ request()->is('form/list') ? 'active' : '' }}" target="_blank"><div>{{ __('ui.all_forms') }}</div></a></li>
+                    <li class="menu-item {{ request()->routeIs('form.create') ? 'active' : '' }}"><a href="{{ route('form.create') }}" class="menu-link {{ request()->routeIs('form.create') ? 'active' : '' }}"><div>{{ __('ui.new_form') }}</div></a></li>
+                    <li class="menu-item {{ request()->routeIs('form.create-subform') ? 'active' : '' }}"><a href="{{ route('form.create-subform') }}" class="menu-link {{ request()->routeIs('form.create-subform') ? 'active' : '' }}"><div>{{ __('ui.new_subform') }}</div></a></li>
+                    <li class="menu-item {{ request()->routeIs('form.attach') ? 'active' : '' }}"><a href="{{ route('form.attach') }}" class="menu-link {{ request()->routeIs('form.attach') ? 'active' : '' }}"><div>{{ __('ui.form_attach') }}</div></a></li>
+                    <li class="menu-item {{ request()->routeIs('form.list') ? 'active' : '' }}"><a href="{{ route('form.list') }}" class="menu-link {{ request()->routeIs('form.list') ? 'active' : '' }}"><div>{{ __('ui.all_forms') }}</div></a></li>
                 </ul>
             </li>
 
@@ -68,9 +67,9 @@
                 </a>
 
                 <ul class="menu-sub">
-                    <li class="menu-item {{ request()->is('user/list-user') ? 'active' : '' }}"><a href="/user/list-user" class="menu-link {{ request()->is('user/list-user') ? 'active' : '' }}"><div>{{ __('ui.all_users') }}</div></a></li>
-                    <li class="menu-item {{ request()->is('user/list-admin') ? 'active' : '' }}"><a href="/user/list-admin" class="menu-link {{ request()->is('user/list-admin') ? 'active' : '' }}"><div>{{ __('ui.all_admins') }}</div></a></li>
-                    <li class="menu-item {{ request()->is('user/new-user') ? 'active' : '' }}"><a href="/user/new-user" class="menu-link {{ request()->is('user/new-user') ? 'active' : '' }}"><div>{{ __('ui.new_user') }}</div></a></li>
+                    <li class="menu-item {{ request()->routeIs('user.list-user') ? 'active' : '' }}"><a href="{{ route('user.list-user') }}" class="menu-link {{ request()->routeIs('user.list-user') ? 'active' : '' }}"><div>{{ __('ui.all_users') }}</div></a></li>
+                    <li class="menu-item {{ request()->routeIs('user.list-admin') ? 'active' : '' }}"><a href="{{ route('user.list-admin') }}" class="menu-link {{ request()->routeIs('user.list-admin') ? 'active' : '' }}"><div>{{ __('ui.all_admins') }}</div></a></li>
+                    <li class="menu-item {{ request()->routeIs('user.create') ? 'active' : '' }}"><a href="{{ route('user.create') }}" class="menu-link {{ request()->routeIs('user.create') ? 'active' : '' }}"><div>{{ __('ui.new_user') }}</div></a></li>
                 </ul>
             </li>
 
@@ -81,10 +80,10 @@
                 </a>
 
                 <ul class="menu-sub">
-                    <li class="menu-item {{ request()->is('facility/list-facility') ? 'active' : '' }}"><a href="/facility/list-facility" class="menu-link {{ request()->is('facility/list-facility') ? 'active' : '' }}"><div>{{ __('ui.all_facilities') }}</div></a></li>
-                    <li class="menu-item {{ request()->is('facility/new-unit') ? 'active' : '' }}"><a href="/facility/new-unit" class="menu-link {{ request()->is('facility/new-unit') ? 'active' : '' }}"><div>{{ __('ui.all_units') }}</div></a></li>
-                    <li class="menu-item {{ request()->is('facility/new-facility') ? 'active' : '' }}"><a href="/facility/new-facility" class="menu-link {{ request()->is('facility/new-facility') ? 'active' : '' }}"><div>{{ __('ui.new_facility') }}</div></a></li>
-                    <li class="menu-item {{ request()->is('facility/new-unit') ? 'active' : '' }}"><a href="/facility/new-unit" class="menu-link {{ request()->is('facility/new-unit') ? 'active' : '' }}"><div>{{ __('ui.new_unit') }}</div></a></li>
+                    <li class="menu-item {{ request()->routeIs('facility.list-facility') ? 'active' : '' }}"><a href="{{ route('facility.list-facility') }}" class="menu-link {{ request()->routeIs('facility.list-facility') ? 'active' : '' }}"><div>{{ __('ui.all_facilities') }}</div></a></li>
+                    <li class="menu-item {{ request()->routeIs('facility.create-unit') ? 'active' : '' }}"><a href="{{ route('facility.create-unit') }}" class="menu-link {{ request()->routeIs('facility.create-unit') ? 'active' : '' }}"><div>{{ __('ui.all_units') }}</div></a></li>
+                    <li class="menu-item {{ request()->routeIs('facility.create-facility') ? 'active' : '' }}"><a href="{{ route('facility.create-facility') }}" class="menu-link {{ request()->routeIs('facility.create-facility') ? 'active' : '' }}"><div>{{ __('ui.new_facility') }}</div></a></li>
+                    <li class="menu-item {{ request()->routeIs('facility.create-unit') ? 'active' : '' }}"><a href="{{ route('facility.create-unit') }}" class="menu-link {{ request()->routeIs('facility.create-unit') ? 'active' : '' }}"><div>{{ __('ui.new_unit') }}</div></a></li>
                 </ul>
             </li>
         @endisAdmin
