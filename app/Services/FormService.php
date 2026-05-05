@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Collection;
 
 class FormService
 {
+    public function __construct(
+        private readonly ActiveSessionService $activeSessionService
+    ) {
+    }
+
     public function getAllForms(): Collection
     {
         // Liste ekraninda kullanici bilgisine ek sorgu atmamak icin iliskiyi onceden yukluyoruz.
@@ -19,7 +24,7 @@ class FormService
     public function createForm(array $payload, int $userId): Form
     {
         // Form kaydini tek noktadan olusturarak controller'i sade tutuyoruz.
-        return Form::query()->create([
+        $form = Form::query()->create([
             'form_title' => $payload['form_title'],
             'form_detail' => $payload['form_detail'] ?? null,
             'annotations' => $payload['annotations'] ?? null,
@@ -28,5 +33,14 @@ class FormService
             'status' => true,
             'created_by' => $userId,
         ]);
+
+        // Form olusturma olayini loglayarak sonradan takip edilebilir hale getiriyoruz.
+        $this->activeSessionService->recordAuditLog(
+            $form->creator,
+            'Yeni form olusturuldu: '.$form->form_title,
+            'form.create.success'
+        );
+
+        return $form;
     }
 }
