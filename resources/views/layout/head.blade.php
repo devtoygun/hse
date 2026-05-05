@@ -34,6 +34,7 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/css/hse-overrides.css') }}" />
 
 <script src="{{ asset('assets/vendor/js/template-customizer.js') }}"></script>
 <script src="{{ asset('assets/vendor/js/helpers.js') }}"></script>

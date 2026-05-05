@@ -1,0 +1,19 @@
+.swal2-container {
+  z-index: 20000 !important;
+}
+
+#toast-container,
+.toast-container,
+.toastr,
+.toast {
+  z-index: 20010 !important;
+}
+
+.modal-backdrop {
+  z-index: 19000 !important;
+}
+
+.modal {
+  z-index: 19010 !important;
+}
+
