@@ -39,12 +39,11 @@ class FormController extends Controller
         return view('app.form.form-attachement');
     }
 
-    public function list(): JsonResponse
+    public function list(): View
     {
-        // Listeleme isteginde tum form kayitlarini JSON olarak donuyoruz.
-        return response()->json([
-            'status' => true,
-            'data' => $this->formService->getAllForms(),
+        // Liste ekranini tum form kayitlariyla birlikte hazirliyoruz.
+        return view('app.form.list', [
+            'forms' => $this->formService->getAllForms(),
         ]);
     }
 
