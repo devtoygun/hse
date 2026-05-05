@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Form;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class FormController extends Controller
 {
@@ -35,5 +38,53 @@ class FormController extends Controller
     {
         return view('app.form.list');
     }
-}
 
+    public function create_form(Request $request): JsonResponse
+    {
+        // Form olusturma ekranindan gelen alanlari dogruluyoruz.
+        $payload = $request->validate([
+            'form_title' => ['required', 'string', 'max:255'],
+            'form_detail' => ['nullable', 'string'],
+            'annotations' => ['nullable', 'string'],
+            'email_sending' => ['required', 'boolean'],
+            'email_recipient_address' => ['nullable', 'email', 'max:255'],
+        ], [
+            'form_title.required' => 'Form basligi zorunludur.',
+            'email_sending.required' => 'E-posta gonderim tercihi zorunludur.',
+            'email_recipient_address.email' => 'Gecerli bir e-posta adresi giriniz.',
+        ]);
+
+        // E-posta gonderimi kapaliysa alici adresini temizliyoruz.
+        if (! (bool) $payload['email_sending']) {
+            $payload['email_recipient_address'] = null;
+        }
+
+        // E-posta gonderimi aciksa alici adresini zorunlu hale getiriyoruz.
+        if ((bool) $payload['email_sending'] && empty($payload['email_recipient_address'])) {
+            return response()->json([
+                'status' => false,
+                'errors' => [
+                    'email_recipient_address' => ['E-posta alici adresi zorunludur.'],
+                ],
+            ], 422);
+        }
+
+        // Form kaydini aktif ve olusturan kullanici bilgisiyle olusturuyoruz.
+        Form::create([
+            'form_title' => $payload['form_title'],
+            'form_detail' => $payload['form_detail'] ?? null,
+            'annotations' => $payload['annotations'] ?? null,
+            'email_sending' => (bool) $payload['email_sending'],
+            'email_recipient_address' => $payload['email_recipient_address'] ?? null,
+            'status' => true,
+            'created_by' => (int) $request->user()->id,
+        ]);
+
+        // Fastpost yapisina uygun basarili JSON cevabi donuyoruz.
+        return response()->json([
+            'status' => true,
+            'message' => 'Form basariyla olusturuldu.',
+            'redirect' => route('form.index'),
+        ]);
+    }
+}
