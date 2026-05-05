@@ -9,8 +9,9 @@ class FormService
 {
     public function getAllForms(): Collection
     {
-        // Tum form kayitlarini en guncelden eskiye dogru cekiyoruz.
+        // Liste ekraninda kullanici bilgisine ek sorgu atmamak icin iliskiyi onceden yukluyoruz.
         return Form::query()
+            ->with(['user:id,firstname,lastname'])
             ->orderByDesc('id')
             ->get();
     }
