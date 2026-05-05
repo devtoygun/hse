@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
 {
@@ -34,8 +35,19 @@ class UserController extends Controller
         return view('app.user.new-user');
     }
 
-    public function change_password(Request $request){
-        return $this->userService->changePassword($request->userid, $request->pass);
+    public function change_password(Request $request): JsonResponse
+    {
+        $payload = $request->validate([
+            'userid' => ['required', 'integer', 'exists:users,id'],
+            'pass' => ['required', 'string'],
+        ], [
+            'userid.required' => 'Kullanici secimi zorunludur.',
+            'userid.exists' => 'Kullanici bulunamadi.',
+            'pass.required' => 'Yonetici sifresi zorunludur.',
+        ]);
+
+        return response()->json(
+            $this->userService->changePassword((int) $payload['userid'], $payload['pass'])
+        );
     }
 }
-
