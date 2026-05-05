@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Form;
+use App\Services\FormService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class FormController extends Controller
 {
+    public function __construct(
+        private readonly FormService $formService
+    ) {
+    }
+
     public function index(): View
     {
         return view('app.form.index');
@@ -41,7 +46,7 @@ class FormController extends Controller
 
     public function create_form(Request $request): JsonResponse
     {
-        // Form olusturma ekranindan gelen alanlari dogruluyoruz.
+        // Form olusturma ekranindan gelen temel alanlari dogruluyoruz.
         $payload = $request->validate([
             'form_title' => ['required', 'string', 'max:255'],
             'form_detail' => ['nullable', 'string'],
@@ -69,21 +74,16 @@ class FormController extends Controller
             ], 422);
         }
 
-        // Form kaydini aktif ve olusturan kullanici bilgisiyle olusturuyoruz.
-        Form::create([
-            'form_title' => $payload['form_title'],
-            'form_detail' => $payload['form_detail'] ?? null,
-            'annotations' => $payload['annotations'] ?? null,
-            'email_sending' => (bool) $payload['email_sending'],
-            'email_recipient_address' => $payload['email_recipient_address'] ?? null,
-            'status' => true,
-            'created_by' => (int) $request->user()->id,
-        ]);
+        // Kayit isini servis katmanina birakarak controller'i sadece akis yonetiminde tutuyoruz.
+        $form = $this->formService->createForm($payload, (int) $request->user()->id);
 
-        // Fastpost yapisina uygun basarili JSON cevabi donuyoruz.
+        // Basarili kayit sonrasinda istemcinin kullanabilecegi cevabi donuyoruz.
         return response()->json([
             'status' => true,
             'message' => 'Form basariyla olusturuldu.',
+            'data' => [
+                'id' => $form->id,
+            ],
             'redirect' => route('form.index'),
         ]);
     }
