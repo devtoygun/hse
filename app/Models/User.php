@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -53,5 +54,13 @@ class User extends Authenticatable
             'first_login' => 'integer',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Gets the forms created by the user.
+     */
+    public function forms(): HasMany
+    {
+        return $this->hasMany(Form::class, 'created_by');
     }
 }
