@@ -4,14 +4,10 @@ namespace App\Services;
 
 use App\Models\Form;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class FormService
 {
-    public function __construct(
-        private readonly ActiveSessionService $activeSessionService
-    ) {
-    }
-
     public function getAllForms(): Collection
     {
         // Liste ekraninda kullanici bilgisine ek sorgu atmamak icin iliskiyi onceden yukluyoruz.
@@ -34,12 +30,14 @@ class FormService
             'created_by' => $userId,
         ]);
 
-        // Form olusturma olayini loglayarak sonradan takip edilebilir hale getiriyoruz.
-        $this->activeSessionService->recordAuditLog(
-            $form->creator,
-            'Yeni form olusturuldu: '.$form->form_title,
-            'form.create.success'
-        );
+        // Form olusturma olayini dogrudan veritabanindaki log tablosuna kaydediyoruz.
+        DB::table('log')->insert([
+            'user_id' => $userId,
+            'message' => 'Yeni form olusturuldu: '.$form->form_title,
+            'code' => 'form.create.success',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         return $form;
     }
