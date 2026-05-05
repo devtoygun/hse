@@ -48,11 +48,11 @@
                                         <td>{{ \Carbon\Carbon::parse($form->created_at)->format('d.m.Y H:i') }}</td>
                                         <td>
                                             <div class="d-flex align-items-center gap-1 flex-nowrap">
-                                                <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-label-info" data-bs-toggle="tooltip" title="Detay">
+                                                <a href="/form/detail/{{ $form->id }}" class="btn btn-sm btn-icon btn-label-info" data-bs-toggle="tooltip" title="Detay">
                                                     <i class="ti ti-eye"></i>
                                                 </a>
 
-                                                <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-label-primary" data-bs-toggle="tooltip" title="Düzenle">
+                                                <a href="/form/edit/{{ $form->id }}" class="btn btn-sm btn-icon btn-label-primary" data-bs-toggle="tooltip" title="Düzenle">
                                                     <i class="ti ti-edit"></i>
                                                 </a>
 
@@ -99,6 +99,88 @@
                     searchable: false
                 }
             ]
+        });
+
+        // Durum degistirme butonlarini tablo ciziminden bagimsiz sekilde yakaliyoruz.
+        document.querySelector('.formListTable tbody').addEventListener('click', function (event) {
+            const statusButton = event.target.closest('button[title="Pasif Yap"], button[title="Aktif Yap"]');
+
+            if (!statusButton) {
+                return;
+            }
+
+            const row = statusButton.closest('tr');
+
+            if (!row) {
+                return;
+            }
+
+            // Satirdaki temel verileri okuyup istekte kullanilacak bilgileri hazirliyoruz.
+            const formId = row.querySelector('td:first-child')?.textContent.replace('#', '').trim();
+            const currentStatusText = row.querySelector('td:nth-child(5) .badge')?.textContent.trim();
+            const isCurrentlyActive = currentStatusText === 'Aktif';
+            const nextStatus = isCurrentlyActive ? 0 : 1;
+            const nextStatusLabel = isCurrentlyActive ? 'pasif' : 'aktif';
+
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: 'Bu işlem kayıt altında tutulur ve geri alınamaz. Devam etmek için kendi oturum şifrenizi giriniz.',
+                input: 'password',
+                inputPlaceholder: 'Oturum şifrenizi giriniz',
+                showCancelButton: true,
+                confirmButtonText: 'Onayla ve Devam Et',
+                cancelButtonText: 'Vazgeç',
+                showLoaderOnConfirm: true,
+                // Sifre girilmeden isleme devam edilmesini engelliyoruz.
+                preConfirm: password => {
+                    if (!password) {
+                        Swal.showValidationMessage('Devam etmek için şifrenizi girmeniz zorunludur.');
+                        return false;
+                    }
+
+                    // Backend hazir oldugunda karsilanacak istegi simdiden gonderiyoruz.
+                    return axios.post('/form/set-status', {
+                        form_id: formId,
+                        pass: password,
+                        status: nextStatus
+                    })
+                    .then(response => response.data)
+                    .catch(error => {
+                        const message =
+                            error?.response?.data?.message ??
+                            'İşlem sırasında bir hata oluştu.';
+
+                        Swal.showValidationMessage(message);
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then(result => {
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                const response = result.value ?? {};
+
+                // Backend cevabina gore kullaniciya sonuc bilgisini gosteriyoruz.
+                const toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+
+                toast.fire({
+                    icon: response.status ? 'success' : 'error',
+                    title: response.message ?? `Form durumu ${nextStatusLabel} yapıldı.`
+                });
+
+                if (response.status) {
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                }
+            });
         });
     </script>
 @endsection
