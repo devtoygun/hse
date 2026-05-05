@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Services\FormService;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\View\View;
 
 class FormController extends Controller
 {
@@ -39,9 +39,13 @@ class FormController extends Controller
         return view('app.form.form-attachement');
     }
 
-    public function list(): View
+    public function list(): JsonResponse
     {
-        return view('app.form.list');
+        // Listeleme isteginde tum form kayitlarini JSON olarak donuyoruz.
+        return response()->json([
+            'status' => true,
+            'data' => $this->formService->getAllForms(),
+        ]);
     }
 
     public function create_form(Request $request): JsonResponse
