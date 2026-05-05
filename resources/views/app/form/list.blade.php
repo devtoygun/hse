@@ -16,8 +16,6 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Form Başlığı</th>
-                                    <th>Form Detayı</th>
-                                    <th>Açıklamalar</th>
                                     <th>E-posta Gönderimi</th>
                                     <th>Alıcı E-posta Adresi</th>
                                     <th>Durum</th>
@@ -31,8 +29,6 @@
                                     <tr>
                                         <td class="fw-bold">#{{ $form->id }}</td>
                                         <td>{{ $form->form_title }}</td>
-                                        <td>{{ $form->form_detail ?: '-' }}</td>
-                                        <td>{{ $form->annotations ?: '-' }}</td>
                                         <td>
                                             <span class="badge {{ $form->email_sending ? 'bg-success' : 'bg-secondary' }}">
                                                 {{ $form->email_sending ? 'Evet' : 'Hayır' }}
@@ -68,9 +64,6 @@
                                                     <i class="ti {{ $form->status ? 'ti-toggle-left' : 'ti-toggle-right' }}"></i>
                                                 </button>
 
-                                                <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-label-secondary" data-bs-toggle="tooltip" title="Soru Ekle">
-                                                    <i class="ti ti-circle-plus"></i>
-                                                </a>
 
                                                 <button type="button" class="btn btn-sm btn-icon btn-label-danger" data-bs-toggle="tooltip" title="Sil">
                                                     <i class="ti ti-trash"></i>
@@ -101,7 +94,7 @@
             columnDefs: [
                 // Islem kolonu icin siralama ve aramayi kapatiyoruz.
                 {
-                    targets: 9,
+                    targets: 7,
                     orderable: false,
                     searchable: false
                 }
