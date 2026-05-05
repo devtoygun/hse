@@ -22,6 +22,7 @@
                                     <th>Alıcı E-posta Adresi</th>
                                     <th>Durum</th>
                                     <th>Oluşturan</th>
+                                    <th>Oluşturulma Tarihi</th>
                                     <th>İşlem</th>
                                 </tr>
                             </thead>
@@ -43,9 +44,14 @@
                                                 {{ $form->status ? 'Aktif' : 'Pasif' }}
                                             </span>
                                         </td>
-                                        <td>{{ $form->created_by }}</td>
                                         <td>
-                                            <div class="d-flex align-items-center gap-1 flex-wrap">
+                                            <a href="/user/profile/{{ $form->created_by }}" class="text-body fw-semibold">
+                                                {{ $form->user ? $form->user->firstname . ' ' . $form->user->lastname : '-' }}
+                                            </a>
+                                        </td>
+                                        <td>{{ \Carbon\Carbon::parse($form->created_at)->format('d.m.Y H:i') }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-1 flex-nowrap">
                                                 <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-label-info" data-bs-toggle="tooltip" title="Detay">
                                                     <i class="ti ti-eye"></i>
                                                 </a>
@@ -95,7 +101,7 @@
             columnDefs: [
                 // Islem kolonu icin siralama ve aramayi kapatiyoruz.
                 {
-                    targets: 8,
+                    targets: 9,
                     orderable: false,
                     searchable: false
                 }
