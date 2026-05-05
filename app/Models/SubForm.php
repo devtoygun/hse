@@ -39,7 +39,7 @@ class SubForm extends Model
      */
     public function form(): BelongsTo
     {
-        return $this->belongsTo(Form::class);
+        return $this->belongsTo(Form::class, 'form_id', 'id');
     }
 
     /**
