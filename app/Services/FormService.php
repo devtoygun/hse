@@ -3,9 +3,18 @@
 namespace App\Services;
 
 use App\Models\Form;
+use Illuminate\Database\Eloquent\Collection;
 
 class FormService
 {
+    public function getAllForms(): Collection
+    {
+        // Tum form kayitlarini en guncelden eskiye dogru cekiyoruz.
+        return Form::query()
+            ->orderByDesc('id')
+            ->get();
+    }
+
     public function createForm(array $payload, int $userId): Form
     {
         // Form kaydini tek noktadan olusturarak controller'i sade tutuyoruz.
