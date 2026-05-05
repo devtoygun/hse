@@ -42,7 +42,7 @@ class Form extends Model
     /**
      * Gets the user record that created the form.
      */
-    public function creator(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }
@@ -50,9 +50,9 @@ class Form extends Model
     /**
      * Gets the top-level questions that belong to the form.
      */
-    public function questions(): HasMany
+    public function formQuestions(): HasMany
     {
-        return $this->hasMany(FormQuestion::class);
+        return $this->hasMany(FormQuestion::class, 'form_id', 'id');
     }
 
     /**
@@ -60,6 +60,6 @@ class Form extends Model
      */
     public function subForms(): HasMany
     {
-        return $this->hasMany(SubForm::class);
+        return $this->hasMany(SubForm::class, 'form_id', 'id');
     }
 }
