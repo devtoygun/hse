@@ -6,6 +6,8 @@ use App\Services\FormService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class FormController extends Controller
 {
@@ -89,5 +91,29 @@ class FormController extends Controller
             ],
             'redirect' => route('form.index'),
         ]);
+    }
+
+
+    public function set_status(Request $request){
+        $form_id = $request->id;
+        $status = $request->status;
+        $pass = $request->password;
+
+        if(empty($pass)){
+            return response()->json(["type"=>"warning", "message" => "Şifrenizi girmelisiniz!"]);
+        }
+
+        if (!Hash::check($pass, Auth::user()->password)) {
+
+            return response()->json([
+                "type"    => "error",
+                "message" => "Şifreniz hatalı!"
+            ]);
+        }
+
+        $response = $this->formService->setStatus($form_id, $status);
+
+        return response()->json($response);
+
     }
 }

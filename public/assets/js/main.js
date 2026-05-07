@@ -107,7 +107,7 @@ function fastpostFirstError(errors) {
   return null;
 }
 
-window.fastpost = function (url, data = {}, redirect = null) {
+window.fastpost = function (url, data = {}, redirect = null, reload = false) {
   return axios
     .post(url, data)
     .then(response => {
@@ -121,20 +121,39 @@ window.fastpost = function (url, data = {}, redirect = null) {
 
       if (FastpostToast) {
         FastpostToast.fire({
-          icon: res.status ? 'success' : 'error',
+          icon: res.type ? 'success' : 'error',
           title: displayMessage
         });
       }
 
-      if (res.status) {
-        const target = res.redirect || redirect;
-        if (target) {
-          setTimeout(() => {
-            window.location.href = target;
-          }, 500);
-        }
-      }
+     if (res.status) {
 
+    // ###########################################################
+    // Sayfa Yenile
+    // ###########################################################
+
+    if (res.reload) {
+
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
+
+        return;
+    }
+
+    // ###########################################################
+    // Redirect İşlemi
+    // ###########################################################
+
+    const target = res.redirect || redirect;
+
+    if (target) {
+
+        setTimeout(() => {
+            window.location.href = target;
+        }, 500);
+    }
+}
       return res;
     })
     .catch(error => {

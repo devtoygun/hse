@@ -41,4 +41,26 @@ class FormService
 
         return $form;
     }
+
+    public function setStatus($form_id, $status)
+    {
+        // ###########################################################
+        // Form Güncelleme
+        // ###########################################################
+
+        Form::where('id', $form_id)->update([
+            'status' => $status
+        ]);
+
+        // ###########################################################
+        // Response
+        // ###########################################################
+
+        return [
+            "type"    => "success",
+            "message" => "Durum güncellendi!",
+            'status' => true,
+            'reload' => true
+        ];
+    }
 }
