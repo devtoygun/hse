@@ -117,7 +117,19 @@
         }
 
         function deleteForm(id){
-            alert(id)
+             swal.fire({
+                title: "Emin misiniz?",
+                text : "Bu işlem kayıt altındadır. Bu işlem geri alınamaz! Devam etmek için lütfen şifrenizi girin.",
+                input: "password",
+                confirmButtonText: "Devam Et",
+                "showCancelButton": true,
+                "cancelButtonText": "Vazgeç",
+            }).then((res) => {
+                if(res.isConfirmed){
+                    fastpost('/form/delete-form', {id:id,password:res.value})
+                    
+                }
+            })
         }
     </script>
 @endsection

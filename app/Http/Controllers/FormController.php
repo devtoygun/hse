@@ -80,17 +80,10 @@ class FormController extends Controller
         }
 
         // Kayit isini servis katmanina birakarak controller'i sadece akis yonetiminde tutuyoruz.
-        $form = $this->formService->createForm($payload, (int) $request->user()->id);
+        $response = $this->formService->createForm($payload, (int) $request->user()->id);
 
         // Basarili kayit sonrasinda istemcinin kullanabilecegi cevabi donuyoruz.
-        return response()->json([
-            'status' => true,
-            'message' => 'Form basariyla olusturuldu.',
-            'data' => [
-                'id' => $form->id,
-            ],
-            'redirect' => route('form.index'),
-        ]);
+        return response()->json($response);
     }
 
 
@@ -106,7 +99,7 @@ class FormController extends Controller
         if (!Hash::check($pass, Auth::user()->password)) {
 
             return response()->json([
-                "type"    => "error",
+                "type"    => "warning",
                 "message" => "Şifreniz hatalı!"
             ]);
         }
@@ -115,5 +108,27 @@ class FormController extends Controller
 
         return response()->json($response);
 
+    }
+
+    public function delete_form(Request $request){
+         $form_id = $request->id;
+        $pass = $request->password;
+
+        if(empty($pass)){
+            return response()->json(["type"=>"warning", "message" => "Şifrenizi girmelisiniz!"]);
+        }
+
+        if (!Hash::check($pass, Auth::user()->password)) {
+
+            return response()->json([
+                "type"    => "error",
+                "message" => "Şifreniz hatalı!"
+            ]);
+        }
+
+
+        $response = $this->formService->deleteForm($form_id);
+
+        return response()->json($response);
     }
 }

@@ -42,7 +42,7 @@ window.fastpost = function (url, data = {}, redirect = null) {
 
             if (res.status) {
                 setTimeout(() => {
-                    if (redirect) { window.location.href = redirect; } 
+                    if (res.redirect) { window.location.href = res.redirect; } 
                     else { window.location.reload(); }
                 }, 500);
             }
@@ -121,7 +121,7 @@ window.fastpost = function (url, data = {}, redirect = null, reload = false) {
 
       if (FastpostToast) {
         FastpostToast.fire({
-          icon: res.type ? 'success' : 'error',
+          icon: res.type,
           title: displayMessage
         });
       }
