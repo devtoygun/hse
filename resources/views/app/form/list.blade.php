@@ -66,7 +66,10 @@
                                                 </button>
 
 
-                                                <button type="button" class="btn btn-sm btn-icon btn-label-danger" data-bs-toggle="tooltip" title="Sil">
+                                                <button 
+                                                onclick="deleteForm({{ $form->id }})"
+                                                type="button" 
+                                                class="btn btn-sm btn-icon btn-label-danger" data-bs-toggle="tooltip" title="Sil">
                                                     <i class="ti ti-trash"></i>
                                                 </button>
                                             </div>
@@ -111,6 +114,10 @@
                     
                 }
             })
+        }
+
+        function deleteForm(id){
+            alert(id)
         }
     </script>
 @endsection

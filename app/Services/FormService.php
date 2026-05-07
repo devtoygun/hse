@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Form;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Auth;
 
 class FormService
 {
@@ -48,13 +49,20 @@ class FormService
         // Form Güncelleme
         // ###########################################################
 
-        Form::where('id', $form_id)->update([
-            'status' => $status
-        ]);
+        $form = Form::find($form_id);
+        $form->status = $status;
+        $form->save();
 
         // ###########################################################
         // Response
         // ###########################################################
+        DB::table('log')->insert([
+            'user_id' => Auth::user()->id,
+            'message' => 'Form durumu değiştirildi: '.$form->form_title,
+            'code' => 'form.setStatus',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         return [
             "type"    => "success",
