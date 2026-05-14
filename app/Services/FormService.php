@@ -156,4 +156,29 @@ class FormService
             "reload"  => true
         ];
     }
+
+    public function saveQuestion($formid,$title,$order,$approval){
+        $question = new FormQuestion;
+        $question->form_id = $formid;
+        $question->question_title = $title;
+        $question->question_order = $order;
+        $question->approval_required = $approval;
+        $question->status = 1;
+        $question->save();
+
+        DB::table('log')->insert([
+            'user_id' => Auth::user()->id,
+            'message' => $formid .' ID\'li forma soru eklendi. Soru ID: '.$question->id,
+            'code' => 'form.add-question',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return [
+            "type" => "success",
+            "message" => "Soru eklendi",
+            "status" => true,
+            "reload" => true
+        ];
+    }
 }

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Form;
 
 class FormController extends Controller
 {
@@ -129,6 +130,32 @@ class FormController extends Controller
 
         $response = $this->formService->deleteForm($form_id);
 
+        return response()->json($response);
+    }
+
+    public function form_detail($id){
+        $form = Form::find($id);
+
+        return view('app.form.form-detail', ['form' => $form]);
+    }
+
+    public function save_question(Request $request){
+        $title = trim(ucfirst($request->title));
+        $order = $request->order || 0;
+        $approval = $request->approval;
+        $formid = $request->formid;
+
+        if(empty($request->title)){
+            return response()->json(["type"=>"warning","message"=>"Soruyu girin..."]);
+        }
+
+        if(empty($request->order)){
+            $order = 0;
+        }
+
+        
+
+        $response = $this->formService->saveQuestion($formid,$title,$order,$approval);
         return response()->json($response);
     }
 }

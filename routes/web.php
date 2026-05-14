@@ -33,6 +33,10 @@ Route::middleware(['auth', EnsureActiveSessionExists::class, TrackActiveSessionA
 
             Route::post('/set-status', 'set_status')->name('set_status');
             Route::post('/delete-form', 'delete_form')->name('delete-form');
+
+            Route::get('/detail/{id}', 'form_detail')->name('form-detail');
+
+            Route::post('/save-question', 'save_question')->name('save-question');
         });
 
     Route::controller(UserController::class)
