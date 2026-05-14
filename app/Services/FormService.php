@@ -181,4 +181,27 @@ class FormService
             "reload" => true
         ];
     }
+
+    public function editQuestion($question_id,$title,$order,$approval){
+        $question = FormQuestion::find($question_id);
+        $question->question_title = $title;
+        $question->question_order = $order;
+        $question->approval_required = $approval;
+        $question->save();
+
+        DB::table('log')->insert([
+            'user_id' => Auth::user()->id,
+            'message' => $question_id .' ID\'li soru düzenlendi.',
+            'code' => 'form.edit-question',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return [
+            "type" => "success",
+            "message" => "Soru düzenlendi",
+            "status" => true,
+            "reload" => true
+        ];
+    }
 }

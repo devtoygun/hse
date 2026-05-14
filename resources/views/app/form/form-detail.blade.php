@@ -158,29 +158,30 @@
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       <div class="text-center mb-4">
                         <h3 class="mb-2">Soruyu Düzenle Ekle</h3>
-                        <p class="text-muted">Soruyu yeniden düzenleyin</p>
+                        <p class="text-muted"><strong>{{$question->id}}</strong> ID'li Soruyu yeniden düzenleyin</p>
                       </div>
                       <form id="addNewCCForm" class="row g-3" onsubmit="return false">
                         <div class="col-12 mb-3">
-                          <label class="form-label w-100" for="modalQuestion">Soru:</label>
+                          <label class="form-label w-100" for="modalEditQuestionTitle{{ $question->id }}">Soru:</label>
                           <div class="input-group input-group-merge">
                             <input
-                              id="modalQuestion"
+                              id="modalEditQuestionTitle{{ $question->id }}"
                               name="modalAddCard"
                               class="form-control"
-                              type="text"/>
+                              type="text"
+                              value="{{ $question->question_title }}"/>
 
                           </div>
                         </div>
                         <div class="col-12 col-md-6 mb-3">
-                          <label class="form-label" for="modalQuestionOrder">Soru Sırası</label>
-                          <input type="number" id="modalQuestionOrder" class="form-control"/>
+                          <label class="form-label" for="modalEditQuestionOrder{{ $question->id }}">Soru Sırası</label>
+                          <input type="number" id="modalEditQuestionOrder{{ $question->id }}" class="form-control" value="{{$question->question_order}}"/>
                         </div>
                        
                        
                         <div class="col-12 mb-3">
                           <label class="switch">
-                            <input type="checkbox" class="switch-input" id="approval_required"/>
+                            <input {{ $question->approval_required ? 'checked':'' }} type="checkbox" class="switch-input" id="editModalQuestionApproval{{ $question->id }}"/>
                             <span class="switch-toggle-slider">
                               <span class="switch-on"></span>
                               <span class="switch-off"></span>
@@ -189,7 +190,7 @@
                           </label>
                         </div>
                         <div class="col-12 text-center">
-                          <button type="submit" onclick="addQuestion({{ $form->id }})" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
+                          <button type="submit" onclick="editQuestion({{ $question->id }})" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
                           <button
                             type="reset"
                             class="btn btn-label-secondary btn-reset"
@@ -283,7 +284,6 @@
         function addQuestion(formid){
             var title = $("#modalQuestion").val()
             var order = $("#modalQuestionOrder").val()
-            var formid = {{ $form->id }}
             var approval
             
             if ($('#approval_required').is(':checked')) {
@@ -293,6 +293,22 @@
             }
 
             fastpost("/form/save-question", {title:title,order:order,approval:approval,formid:formid})
+
+        }
+
+        function editQuestion(questionId){
+            var title = $("#modalEditQuestionTitle"+questionId).val()
+            var order = $("#modalEditQuestionOrder"+questionId).val()
+            var approval
+
+            if ($('#editModalQuestionApproval'+questionId).is(':checked')) {
+                approval = 1 
+            } else {
+                approval = 0
+            }
+
+            fastpost("/form/edit-question", {title:title,order:order,approval:approval,questionid:questionId})
+
 
         }
     </script>

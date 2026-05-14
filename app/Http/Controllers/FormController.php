@@ -158,4 +158,23 @@ class FormController extends Controller
         $response = $this->formService->saveQuestion($formid,$title,$order,$approval);
         return response()->json($response);
     }
+
+
+    public function edit_question(Request $request){
+         $title = trim(ucfirst($request->title));
+        $order = $request->order;
+        $approval = $request->approval;
+        $question_id = $request->questionid;
+
+         if(empty($request->title)){
+            return response()->json(["type"=>"warning","message"=>"Soruyu girin..."]);
+        }
+
+        if(empty($request->order)){
+            $order = 0;
+        }
+
+        $response = $this->formService->editQuestion($question_id,$title,$order,$approval);
+        return response()->json($response);
+    }
 }

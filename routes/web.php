@@ -37,6 +37,7 @@ Route::middleware(['auth', EnsureActiveSessionExists::class, TrackActiveSessionA
             Route::get('/detail/{id}', 'form_detail')->name('form-detail');
 
             Route::post('/save-question', 'save_question')->name('save-question');
+            Route::post('/edit-question', 'edit_question')->name('edit-question');
         });
 
     Route::controller(UserController::class)
