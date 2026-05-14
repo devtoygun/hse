@@ -83,9 +83,16 @@
                         data-bs-target="#soruModal" href="javascript:;"><i class="fas fa-plus"></i></a>
                     </h4>
 
-
-                    <div class="table-responsive text-nowrap">
                   <table class="table table-sm">
+                    <colgroup>
+                        <col style="width: 80px;">
+                        <col style="width: 75%;">
+                        <col style="width: 100px;">
+                        <col style="width: 100px;">
+                        <col style="width: 100px;">
+                        <col style="width: 100px;">
+
+                    </colgroup>
                     <thead>
                       <tr>
                         <th>ID</th>
@@ -97,61 +104,110 @@
                       </tr>
                     </thead>
                     <tbody class="table-border-bottom-0">
+                        @foreach (
+                            $form->formQuestions
+                                ->sortBy([
+                                    fn ($a, $b) => 
+                                        ($a->question_order == 0 && $b->question_order == 0)
+                                            ? $a->id <=> $b->id
+                                            : $a->question_order <=> $b->question_order
+                                ])
+                            as $question
+                        )
+             
                       <tr>
                         <td>
-                          <i class="ti ti-brand-angular ti-lg text-danger me-3"></i> <strong>Angular Project</strong>
+                         <strong>{{ $question->id }}</strong>
                         </td>
-                        <td>Albert Cook</td>
+                        <td>{{$question->question_title}}</td>
                         <td>
-                          <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
-                            <li
-                              data-bs-toggle="tooltip"
-                              data-popup="tooltip-custom"
-                              data-bs-placement="top"
-                              class="avatar avatar-xs pull-up"
-                              title="Lilian Fuller">
-                              <img src="../../assets/img/avatars/5.png" alt="Avatar" class="rounded-circle" />
-                            </li>
-                            <li
-                              data-bs-toggle="tooltip"
-                              data-popup="tooltip-custom"
-                              data-bs-placement="top"
-                              class="avatar avatar-xs pull-up"
-                              title="Sophia Wilkerson">
-                              <img src="../../assets/img/avatars/6.png" alt="Avatar" class="rounded-circle" />
-                            </li>
-                            <li
-                              data-bs-toggle="tooltip"
-                              data-popup="tooltip-custom"
-                              data-bs-placement="top"
-                              class="avatar avatar-xs pull-up"
-                              title="Christina Parker">
-                              <img src="../../assets/img/avatars/7.png" alt="Avatar" class="rounded-circle" />
-                            </li>
-                          </ul>
+                         {{ $question->question_order }}
                         </td>
-                        <td><span class="badge bg-label-primary me-1">Active</span></td>
+                        <td><span class="badge {{$question->approval_required == 1 ? 'bg-label-primary':'bg-label-info'}} me-1">{{$question->approval_required == 1 ? 'Evet':'Hayır'}}</span></td>
+                        <td><span class="badge {{$question->status == 1 ? 'bg-label-success':'bg-label-warning'}} me-1">{{$question->status == 1 ? 'Aktif':'Pasif'}}</span></td>
                         <td>
                           <div class="dropdown">
                             <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                               <i class="ti ti-dots-vertical"></i>
                             </button>
                             <div class="dropdown-menu">
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="ti ti-pencil me-1"></i> Edit</a
+                              <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal"
+                        data-bs-target="#soruEditModal{{ $question->id }}"
+                                ><i class="ti ti-pencil me-1"></i> Düzenle</a
                               >
                               <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="ti ti-trash me-1"></i> Delete</a
+                                ><i class="ti ti-clipboard-plus me-1"></i> Alt Form Ekle</a
+                              >
+                              <a class="dropdown-item" href="javascript:void(0);"
+                                ><i class="ti ti-toggle-left me-1"></i> Pasif Yap</a
+                              >
+                              <a class="dropdown-item" href="javascript:void(0);"
+                                ><i class="ti ti-trash me-1"></i> Sil</a
                               >
                             </div>
                           </div>
                         </td>
                       </tr>
-                    
+
+
+                      <!-- Soru Düzenleme Modal -->
+              <div class="modal fade" id="soruEditModal{{ $question->id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered1 modal-simple modal-add-new-cc">
+                  <div class="modal-content p-3 p-md-5">
+                    <div class="modal-body">
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      <div class="text-center mb-4">
+                        <h3 class="mb-2">Soruyu Düzenle Ekle</h3>
+                        <p class="text-muted">Soruyu yeniden düzenleyin</p>
+                      </div>
+                      <form id="addNewCCForm" class="row g-3" onsubmit="return false">
+                        <div class="col-12 mb-3">
+                          <label class="form-label w-100" for="modalQuestion">Soru:</label>
+                          <div class="input-group input-group-merge">
+                            <input
+                              id="modalQuestion"
+                              name="modalAddCard"
+                              class="form-control"
+                              type="text"/>
+
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                          <label class="form-label" for="modalQuestionOrder">Soru Sırası</label>
+                          <input type="number" id="modalQuestionOrder" class="form-control"/>
+                        </div>
+                       
+                       
+                        <div class="col-12 mb-3">
+                          <label class="switch">
+                            <input type="checkbox" class="switch-input" id="approval_required"/>
+                            <span class="switch-toggle-slider">
+                              <span class="switch-on"></span>
+                              <span class="switch-off"></span>
+                            </span>
+                            <span class="switch-label">Bu soru için onay gereksin mi?</span>
+                          </label>
+                        </div>
+                        <div class="col-12 text-center">
+                          <button type="submit" onclick="addQuestion({{ $form->id }})" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
+                          <button
+                            type="reset"
+                            class="btn btn-label-secondary btn-reset"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                            Vazgeç
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--/ Soru Düzenleme Modal -->
+                    @endforeach
                     </tbody>
                   </table>
-                </div>
-
+       
 
                 </div>
             </div>

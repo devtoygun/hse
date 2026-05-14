@@ -141,7 +141,7 @@ class FormController extends Controller
 
     public function save_question(Request $request){
         $title = trim(ucfirst($request->title));
-        $order = $request->order || 0;
+        $order = $request->order;
         $approval = $request->approval;
         $formid = $request->formid;
 
