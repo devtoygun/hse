@@ -55,9 +55,14 @@ Route::middleware(['auth', EnsureActiveSessionExists::class, TrackActiveSessionA
         ->prefix('facility')
         ->name('facility.')
         ->group(function () {
-            Route::get('/list-facility', 'listFacilities')->name('list-facility');
-            Route::get('/new-unit', 'createUnit')->name('create-unit');
-            Route::get('/new-facility', 'createFacility')->name('create-facility');
+            Route::get('/', 'listFacilities')->name('list-facility');
+            Route::get('/new', 'new')->name('new-facility');
+            Route::post('/new-facility', 'new_facility');
+            Route::post('/new-unit', 'new_unit');
+
+            Route::post('/delete-facility', 'delete_facility');
+            Route::post('/delete-unit', 'delete_unit');
+
         });
 });
 

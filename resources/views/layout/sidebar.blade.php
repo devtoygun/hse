@@ -74,17 +74,10 @@
             </li>
 
             <li class="menu-item {{ $isFacilityManagement ? 'active open' : '' }}">
-                <a href="javascript:void(0);" class="menu-link menu-toggle {{ $isFacilityManagement ? 'active' : '' }}">
+                <a href="/facility" class="menu-link {{ $isFacilityManagement ? 'active' : '' }}">
                     <i class="menu-icon tf-icons ti ti-building-factory"></i>
-                    <div>{{ __('ui.facility_management') }}</div>
+                    <div>Tesisler</div>
                 </a>
-
-                <ul class="menu-sub">
-                    <li class="menu-item {{ request()->routeIs('facility.list-facility') ? 'active' : '' }}"><a href="{{ route('facility.list-facility') }}" class="menu-link {{ request()->routeIs('facility.list-facility') ? 'active' : '' }}"><div>{{ __('ui.all_facilities') }}</div></a></li>
-                    <li class="menu-item {{ request()->routeIs('facility.create-unit') ? 'active' : '' }}"><a href="{{ route('facility.create-unit') }}" class="menu-link {{ request()->routeIs('facility.create-unit') ? 'active' : '' }}"><div>{{ __('ui.all_units') }}</div></a></li>
-                    <li class="menu-item {{ request()->routeIs('facility.create-facility') ? 'active' : '' }}"><a href="{{ route('facility.create-facility') }}" class="menu-link {{ request()->routeIs('facility.create-facility') ? 'active' : '' }}"><div>{{ __('ui.new_facility') }}</div></a></li>
-                    <li class="menu-item {{ request()->routeIs('facility.create-unit') ? 'active' : '' }}"><a href="{{ route('facility.create-unit') }}" class="menu-link {{ request()->routeIs('facility.create-unit') ? 'active' : '' }}"><div>{{ __('ui.new_unit') }}</div></a></li>
-                </ul>
             </li>
         @endisAdmin
     </ul>
