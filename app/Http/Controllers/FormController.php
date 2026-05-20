@@ -19,7 +19,11 @@ class FormController extends Controller
 
     public function index(): View
     {
-        return view('app.form.index');
+        return view('app.form.index', ['forms'=>Form::all()]);
+    } 
+
+    public function form_start($id){
+        return view('app.form.start', ['form' => Form::find($id)]);
     }
 
     public function archive(): View

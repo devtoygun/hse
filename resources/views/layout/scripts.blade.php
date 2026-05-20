@@ -24,3 +24,11 @@
 <script src="{{ asset('assets/js/main.js') }}"></script>
 <script src="{{ asset('assets/js/pages-auth.js') }}"></script>
 <script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
+
+<script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
+
+ <script src="{{ asset('assets/js/form-wizard-icons.js') }}"></script>
+
+

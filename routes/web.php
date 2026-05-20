@@ -23,6 +23,8 @@ Route::middleware(['auth', EnsureActiveSessionExists::class, TrackActiveSessionA
         ->name('form.')
         ->group(function () {
             Route::get('/', 'index')->name('index');
+
+            Route::get('/{id}', 'form_start');
             Route::get('/archive', 'archive')->name('archive');
             Route::get('/new-form', 'create')->name('create');
             Route::get('/new-subform', 'createSubform')->name('create-subform');
