@@ -53,6 +53,30 @@ class FormService
         ];
     }
 
+    public function createSubForm(array $payload, int $userId): array
+    {
+        $subForm = SubForm::query()->create([
+            'form_id' => $payload['form_id'],
+            'form_title' => $payload['form_title'],
+            'status' => true,
+        ]);
+
+        DB::table('log')->insert([
+            'user_id' => $userId,
+            'message' => 'Yeni alt form olusturuldu: '.$subForm->form_title,
+            'code' => 'subform.create.success',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return [
+            'type' => 'success',
+            'message' => 'Alt form olusturuldu',
+            'status' => true,
+            'redirect' => '/form/detail/'.$subForm->form_id,
+        ];
+    }
+
     public function setStatus($form_id, $status)
     {
         // ###########################################################

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SubFormQuestion extends Model
 {
@@ -44,5 +45,10 @@ class SubFormQuestion extends Model
     public function subForm(): BelongsTo
     {
         return $this->belongsTo(SubForm::class, 'subform_id');
+    }
+
+    public function archiveAnswers(): HasMany
+    {
+        return $this->hasMany(FormArchiveSubFormAnswer::class, 'sub_form_question_id');
     }
 }

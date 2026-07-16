@@ -28,6 +28,13 @@ return [
         'key' => env('RESEND_KEY'),
     ],
 
+    'mutlucell' => [
+        'url' => env('MUTLUCELL_URL', 'https://smsgw.mutlucell.com/smsgw-ws/sndblkex'),
+        'username' => env('MUTLUCELL_USERNAME'),
+        'password' => env('MUTLUCELL_PASSWORD'),
+        'originator' => env('MUTLUCELL_ORIGINATOR'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

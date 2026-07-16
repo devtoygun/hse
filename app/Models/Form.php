@@ -62,4 +62,12 @@ class Form extends Model
     {
         return $this->hasMany(SubForm::class, 'form_id', 'id');
     }
+
+    /**
+     * Gets archive records created from this form.
+     */
+    public function archives(): HasMany
+    {
+        return $this->hasMany(FormArchive::class, 'form_id', 'id');
+    }
 }

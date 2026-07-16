@@ -1,206 +1,138 @@
-@extends('master')
+@extends('master') {{-- BURAYI KENDİ LAYOUTUNA GÖRE DEĞİŞTİR --}}
 
 @section('content')
 
-<style>
+<div class="container py-4">
 
-    /* ================================================== */
-    /* RADIO CARD */
-    /* ================================================== */
-    .radio-card{
-        border:2px solid #d9dee3;
-        border-radius:16px;
-        cursor:pointer;
-        transition:0.2s ease;
-        min-height:220px;
+    {{-- -------------------------------------------------- --}}
+    {{-- Header --}}
+    {{-- -------------------------------------------------- --}}
+    <div class="row justify-content-center">
 
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-    }
+        <div class="col-lg-8">
 
-    /* ================================================== */
-    /* HOVER */
-    /* ================================================== */
-    .radio-card:hover{
-        border-color:#696cff;
-        transform:translateY(-2px);
-    }
+            <div class="card">
 
-    /* ================================================== */
-    /* ACTIVE */
-    /* ================================================== */
-    .radio-card-input:checked + .radio-card{
-        border-color:#696cff;
-        background:rgba(105,108,255,0.08);
-        box-shadow:0 0 0 4px rgba(105,108,255,0.15);
-    }
+                <div class="card-body">
 
-</style>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <h4 class="card-title mb-2">{{ $form->form_title }}</h4>
-            <p class="text-muted mb-0">{{ $form->form_detail }}</p>
-        </div>
-    </div>
+                        <h3 class="mb-0">
+                            {{ $form->form_title ?? 'Form' }}
+                        </h3>
 
-    <div class="row">
+                        <span id="questionCounter" class="badge bg-primary">
+                            1 / {{ $form->formQuestions->count() }}
+                        </span>
 
-        <!-- Vertical Icons Wizard -->
-        <div class="col-12">
+                    </div>
 
-            <div class="bs-stepper vertical wizard-vertical-icons-example mt-2">
+                    {{-- -------------------------------------------------- --}}
+                    {{-- Questions --}}
+                    {{-- -------------------------------------------------- --}}
+                    @foreach($form->formQuestions as $index => $question)
 
-                <!-- ================================================== -->
-                <!-- STEPPER HEADER -->
-                <!-- ================================================== -->
-                <div class="bs-stepper-header fixed">
+                        <div
+                            class="question-card {{ $index > 0 ? 'd-none' : '' }}"
+                            data-index="{{ $index }}"
+                            data-question-id="{{ $question->id }}"
+                            data-approval-required="{{ $question->approval_required }}"
+                            data-send-notification="{{ (int) $question->send_nofitication }}"
+                        >
 
-                    @foreach ($form->formQuestions as $item)
+                            {{-- ---------------------------------------------- --}}
+                            {{-- Badges --}}
+                            {{-- ---------------------------------------------- --}}
+                            <div class="mb-3">
 
-                        <div class="step" data-target="#soru-{{ $item->id }}">
+                                @if($question->approval_required)
 
-                            <button type="button" class="step-trigger">
-
-                                <span class="bs-stepper-circle">
-                                    <i class="ti ti-file-description"></i>
-                                </span>
-
-                                <span class="bs-stepper-label">
-                                    <span class="bs-stepper-title">
-                                        Soru #{{ $item->id }}
+                                    <span class="badge bg-warning text-dark">
+                                        Onay Gerekiyor
                                     </span>
 
-                                    <span class="bs-stepper-subtitle answer-text">
-                                        Henüz cevap verilmedi
+                                @endif
+
+                                @if($question->send_nofitication)
+
+                                    <span class="badge bg-info">
+                                        Bildirim Gönderilecek
                                     </span>
-                                </span>
 
-                            </button>
-
-                        </div>
-
-                        @if(!$loop->last)
-                            <div class="line"></div>
-                        @endif
-
-                    @endforeach
-
-                </div>
-
-                <!-- ================================================== -->
-                <!-- STEPPER CONTENT -->
-                <!-- ================================================== -->
-                <div class="bs-stepper-content">
-
-                    <form onsubmit="return false">
-
-                        @foreach ($form->formQuestions as $item)
-
-                            <div id="soru-{{ $item->id }}" class="content">
-
-                                <div class="content-header mb-3">
-                                    <h6 class="mb-0">
-                                        Soru #{{ $item->id }}
-                                    </h6>
-
-                                    <small>
-                                        Lütfen cevabınızı işaretleyin   
-                                    </small>
-                                </div>
-
-                                <h4>{{ $item->question_title }}</h4>
-
-                                <div class="row mt-4">
-
-                                    <!-- ================================================== -->
-                                    <!-- YES OPTION -->
-                                    <!-- ================================================== -->
-                                    <div class="col-6">
-
-                                        <label class="w-100">
-
-                                            <input
-                                                type="radio"
-                                                name="question_{{ $item->id }}"
-                                                value="yes"
-                                                class="d-none radio-card-input"
-                                            >
-
-                                            <div class="radio-card text-center p-5">
-
-                                                <i class="ti ti-check fs-1 mb-3"></i>
-
-                                                <h4 class="mb-0">
-                                                    Evet
-                                                </h4>
-
-                                            </div>
-
-                                        </label>
-
-                                    </div>
-
-                                    <!-- ================================================== -->
-                                    <!-- NO OPTION -->
-                                    <!-- ================================================== -->
-                                    <div class="col-6">
-
-                                        <label class="w-100">
-
-                                            <input
-                                                type="radio"
-                                                name="question_{{ $item->id }}"
-                                                value="no"
-                                                class="d-none radio-card-input"
-                                            >
-
-                                            <div class="radio-card text-center p-5">
-
-                                                <i class="ti ti-x fs-1 mb-3"></i>
-
-                                                <h4 class="mb-0">
-                                                    Hayır
-                                                </h4>
-
-                                            </div>
-
-                                        </label>
-
-                                    </div>
-
-                                </div>
-
-                                <hr>
-
-
-                                 <div class="d-flex justify-content-between">
-
-        <button
-            type="button"
-            class="btn btn-label-secondary btn-prev"
-        >
-            Geri
-        </button>
-
-        <button
-            type="button"
-            class="btn btn-primary btn-next"
-            disabled
-        >
-            Devam
-        </button>
-
-    </div>
-
+                                @endif
 
                             </div>
 
-                        @endforeach
+                            {{-- ---------------------------------------------- --}}
+                            {{-- Question --}}
+                            {{-- ---------------------------------------------- --}}
+                            <h4 class="mb-4">
+                                {{ $question->question_title }}
+                            </h4>
 
-                    </form>
+                            {{-- ---------------------------------------------- --}}
+                            {{-- Answers --}}
+                            {{-- ---------------------------------------------- --}}
+                            <div class="d-flex gap-4">
+
+                                <div class="form-check">
+
+                                    <input
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="question_{{ $question->id }}"
+                                        value="yes"
+                                    >
+
+                                    <label class="form-check-label">
+                                        Evet
+                                    </label>
+
+                                </div>
+
+                                <div class="form-check">
+
+                                    <input
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="question_{{ $question->id }}"
+                                        value="no"
+                                    >
+
+                                    <label class="form-check-label">
+                                        Hayır
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    @endforeach
+
+                    {{-- -------------------------------------------------- --}}
+                    {{-- Navigation --}}
+                    {{-- -------------------------------------------------- --}}
+                    <div class="d-flex justify-content-between mt-5">
+
+                        <button
+                            type="button"
+                            id="btnPrevious"
+                            class="btn btn-secondary"
+                        >
+                            Geri
+                        </button>
+
+                        <button
+                            type="button"
+                            id="btnNext"
+                            class="btn btn-primary"
+                        >
+                            Devam
+                        </button>
+
+                    </div>
 
                 </div>
 
@@ -210,303 +142,526 @@
 
     </div>
 
+</div>
 
+{{-- -------------------------------------------------- --}}
+{{-- Finish Modal --}}
+{{-- -------------------------------------------------- --}}
+<div
+    class="modal fade"
+    id="finishModal"
+    tabindex="-1"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+>
 
+    <div class="modal-dialog">
 
+        <div class="modal-content">
 
+            <div class="modal-header">
 
+                <h5 class="modal-title">
+                    Form Tamamlandı
+                </h5>
 
+            </div>
 
+            <div class="modal-body">
 
+                Tüm sorular cevaplandı.
 
+                İmzala butonuna basarak işlemi tamamlayabilirsiniz.
 
-    <div class="modal" tabindex="-1" role="dialog" id="finishModal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Modal body text goes here.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Save changes</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    id="btnSaveForm"
+                    class="btn btn-success"
+                >
+                    İmzala
+                </button>
+
+            </div>
+
+        </div>
+
     </div>
-  </div>
+
 </div>
 
 @endsection
 
-
 @section('script')
- <script>
+
+@php
+    $subFormQuestions = $form->subForms
+        ->flatMap(fn ($subForm) => $subForm->questions->map(fn ($question) => [
+            'id' => $question->id,
+            'subform_id' => $subForm->id,
+            'subform_title' => $subForm->form_title,
+            'question_title' => $question->question_title,
+            'question_order' => $question->question_order,
+        ]))
+        ->values();
+@endphp
+
+<script>
+
 document.addEventListener('DOMContentLoaded', function () {
 
     // --------------------------------------------------
-    // Wizard Element
+    // Variables
     // --------------------------------------------------
-    const wizard = document.querySelector('.wizard-vertical-icons-example');
+    let currentQuestionIndex = 0;
+
+    let answers = {};
+
+    let subformAnswers = {};
+
+    let subformsAsked = false;
+
+    const subFormQuestions =
+        @json($subFormQuestions);
+
+    const formStartedAt =
+        new Date();
+
+    const cards =
+        document.querySelectorAll('.question-card');
+
+    const totalQuestions =
+        cards.length;
+
+    const counter =
+        document.getElementById('questionCounter');
+
+    const finishModal =
+        new bootstrap.Modal(
+            document.getElementById('finishModal'),
+            {
+                backdrop: 'static',
+                keyboard: false
+            }
+        );
 
     // --------------------------------------------------
-    // Init Stepper
+    // Device Info
     // --------------------------------------------------
-    const stepper = new Stepper(wizard, {
-        linear: true,
-        animation: true
-    });
+    function getDeviceInfo()
+    {
+        return {
+            navigator: {
+                user_agent: navigator.userAgent || null,
+                platform: navigator.platform || null,
+                language: navigator.language || null,
+                languages: navigator.languages || [],
+                cookie_enabled: navigator.cookieEnabled,
+                do_not_track: navigator.doNotTrack || null,
+                hardware_concurrency: navigator.hardwareConcurrency || null,
+                device_memory: navigator.deviceMemory || null,
+                max_touch_points: navigator.maxTouchPoints || 0,
+                vendor: navigator.vendor || null
+            },
+            screen: {
+                width: window.screen?.width || null,
+                height: window.screen?.height || null,
+                available_width: window.screen?.availWidth || null,
+                available_height: window.screen?.availHeight || null,
+                color_depth: window.screen?.colorDepth || null,
+                pixel_depth: window.screen?.pixelDepth || null,
+                pixel_ratio: window.devicePixelRatio || null
+            },
+            viewport: {
+                width: window.innerWidth || null,
+                height: window.innerHeight || null
+            },
+            timezone: {
+                name: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
+                offset_minutes: new Date().getTimezoneOffset()
+            }
+        };
+    }
 
     // --------------------------------------------------
-    // Remove Default Active Classes
+    // Toast
     // --------------------------------------------------
-    wizard.querySelectorAll('.step').forEach(step => {
-        step.classList.remove('active');
-    });
-
-    wizard.querySelectorAll('.content').forEach(content => {
-        content.classList.remove('active', 'dstepper-block', 'dstepper-none');
-    });
-
-    // --------------------------------------------------
-    // First Step Active
-    // --------------------------------------------------
-    const firstStep = wizard.querySelector('.step');
-
-    if (firstStep) {
-
-        firstStep.classList.add('active');
-
-        const trigger = firstStep.querySelector('.step-trigger');
-
-        if (trigger) {
-            trigger.setAttribute('aria-selected', 'true');
+    function showToast(type, message)
+    {
+        if (typeof toastr !== 'undefined')
+        {
+            toastr[type](message);
+            return;
         }
+
+        alert(message);
     }
 
     // --------------------------------------------------
-    // First Content Active
+    // Update Counter
     // --------------------------------------------------
-    const firstContent = wizard.querySelector('.content');
-
-    if (firstContent) {
-
-        firstContent.classList.add('active');
-        firstContent.classList.add('dstepper-block');
-
+    function updateCounter()
+    {
+        counter.innerHTML =
+            `${currentQuestionIndex + 1} / ${totalQuestions}`;
     }
 
     // --------------------------------------------------
-    // Radio Change Event
+    // Show Question
     // --------------------------------------------------
-    document.querySelectorAll('.radio-card-input').forEach(input => {
+    function showQuestion(index)
+    {
+        cards.forEach(card => {
+            card.classList.add('d-none');
+        });
 
-        input.addEventListener('change', function () {
+        cards[index].classList.remove('d-none');
 
-            // ----------------------------------------------
-            // Current Content
-            // ----------------------------------------------
-            const currentContent = input.closest('.content');
+        updateCounter();
+    }
 
-            // ----------------------------------------------
-            // Current Question ID
-            // ----------------------------------------------
-            const contentId = currentContent.getAttribute('id');
+    // --------------------------------------------------
+    // Sub Form Questions
+    // --------------------------------------------------
+    async function askSubFormQuestions()
+    {
+        if (subformsAsked || subFormQuestions.length === 0)
+        {
+            subformsAsked = true;
+            return true;
+        }
 
-            // ----------------------------------------------
-            // Related Step
-            // ----------------------------------------------
-            const relatedStep = document.querySelector(
-                `.step[data-target="#${contentId}"]`
-            );
+        for (let index = 0; index < subFormQuestions.length; index++)
+        {
+            const question =
+                subFormQuestions[index];
 
-            // ----------------------------------------------
-            // Subtitle Area
-            // ----------------------------------------------
-            const subtitle = relatedStep.querySelector('.answer-text');
+            const result =
+                await Swal.fire({
+                    title:
+                        `${question.subform_title} (${index + 1}/${subFormQuestions.length})`,
 
-            // ----------------------------------------------
-            // Selected Text
-            // ----------------------------------------------
-            let answerText = '';
+                    text:
+                        question.question_title,
 
-            if (input.value === 'yes') {
-                answerText = 'Cevap verildi : Evet';
+                    input:
+                        'radio',
+
+                    inputOptions:
+                        {
+                            yes: 'Evet',
+                            no: 'Hayir'
+                        },
+
+                    inputValue:
+                        subformAnswers[question.id] || null,
+
+                    allowOutsideClick:
+                        false,
+
+                    allowEscapeKey:
+                        false,
+
+                    showCancelButton:
+                        false,
+
+                    confirmButtonText:
+                        'Devam',
+
+                    inputValidator:
+                        (value) => {
+                            if (!value)
+                            {
+                                return 'Lutfen bir cevap seciniz.';
+                            }
+
+                            return null;
+                        }
+                });
+
+            if (!result.isConfirmed)
+            {
+                return false;
             }
 
-            if (input.value === 'no') {
-                answerText = 'Cevap verildi : Hayır';
+            subformAnswers[question.id] =
+                result.value;
+        }
+
+        subformsAsked = true;
+        return true;
+    }
+
+    // --------------------------------------------------
+    // Previous Button
+    // --------------------------------------------------
+    document
+        .getElementById('btnPrevious')
+        .addEventListener('click', function () {
+
+            if (currentQuestionIndex <= 0)
+            {
+                return;
             }
 
-            // ----------------------------------------------
-            // Update Subtitle
-            // ----------------------------------------------
-            subtitle.innerHTML = answerText;
+            currentQuestionIndex--;
+
+            showQuestion(currentQuestionIndex);
 
         });
 
-    });
+    // --------------------------------------------------
+    // Next Button
+    // --------------------------------------------------
+    document
+        .getElementById('btnNext')
+        .addEventListener('click', async function () {
 
+            const currentCard =
+                cards[currentQuestionIndex];
 
+            const questionId =
+                currentCard.dataset.questionId;
 
-   // --------------------------------------------------
-// Next Buttons
-// --------------------------------------------------
-document.querySelectorAll('.btn-next').forEach(button => {
+            const approvalRequired =
+                currentCard.dataset.approvalRequired === '1';
 
-    button.addEventListener('click', function () {
+            const sendNotification =
+                currentCard.dataset.sendNotification === '1';
 
-        // ----------------------------------------------
-        // Current Content
-        // ----------------------------------------------
-        const currentContent = button.closest('.content');
+            const selectedAnswer =
+                currentCard.querySelector(
+                    'input[type="radio"]:checked'
+                );
 
-        // ----------------------------------------------
-        // Checked Radio
-        // ----------------------------------------------
-        const checkedRadio = currentContent.querySelector(
-            '.radio-card-input:checked'
-        );
+            if (!selectedAnswer)
+            {
+                showToast(
+                    'warning',
+                    'Lütfen bir cevap seçiniz.'
+                );
 
-        // ----------------------------------------------
-        // Validation
-        // ----------------------------------------------
-        if (!checkedRadio) {
+                return;
+            }
+
+            const answer =
+                selectedAnswer.value;
+
+            answers[questionId] = answer;
+
+            // ------------------------------------------
+            // Notification / SMS Trigger
+            // ------------------------------------------
+            if (
+                sendNotification ||
+                (
+                    approvalRequired &&
+                    answer === 'yes'
+                )
+            )
+            {
+                const sendResponse =
+                    await axios.post(
+                        '/form/send-approval-code',
+                        {
+                            question_id: questionId,
+                            answer: answer
+                        }
+                    )
+                    .then(response => response.data)
+                    .catch(() => ({
+                        status: false,
+                        message: 'İşlem başarısız.'
+                    }));
+
+                if (!sendResponse.status)
+                {
+                    showToast(
+                        'error',
+                        sendResponse.message
+                    );
+
+                    return;
+                }
+            }
+
+            // ------------------------------------------
+            // Approval Required
+            // ------------------------------------------
+            if (
+                approvalRequired &&
+                answer === 'yes'
+            )
+            {
+                const result =
+                    await Swal.fire({
+
+                        title: 'Onay Kodu',
+
+                        text:
+                            'Telefonunuza gönderilen kodu giriniz.',
+
+                        input: 'text',
+
+                        inputPlaceholder:
+                            'Onay Kodu',
+
+                        allowOutsideClick: false,
+
+                        allowEscapeKey: false,
+
+                        showCancelButton: false,
+
+                        confirmButtonText:
+                            'Doğrula',
+
+                        preConfirm: async (code) => {
+
+                            const verifyResponse =
+                                await axios.post(
+                                    '/form/verify-approval-code',
+                                    {
+                                        question_id:
+                                            questionId,
+                                        code: code
+                                    }
+                                )
+                                .then(response => response.data)
+                                .catch(() => ({
+                                    status: false,
+                                    message:
+                                        'Bağlantı hatası oluştu.'
+                                }));
+
+                            if (!verifyResponse.status)
+                            {
+                                Swal.showValidationMessage(
+                                    verifyResponse.message ||
+                                    'Kod hatalı.'
+                                );
+
+                                return false;
+                            }
+
+                            return true;
+
+                        }
+
+                    });
+
+                if (!result.isConfirmed)
+                {
+                    return;
+                }
+            }
+
+            // ------------------------------------------
+            // Last Question
+            // ------------------------------------------
+            if (
+                currentQuestionIndex >=
+                totalQuestions - 1
+            )
+            {
+                const subFormsCompleted =
+                    await askSubFormQuestions();
+
+                if (!subFormsCompleted)
+                {
+                    return;
+                }
+
+                finishModal.show();
+                return;
+            }
+
+            // ------------------------------------------
+            // Next Question
+            // ------------------------------------------
+            currentQuestionIndex++;
+
+            showQuestion(currentQuestionIndex);
+
+        });
+
+    // --------------------------------------------------
+    // Save Form
+    // --------------------------------------------------
+    document
+        .getElementById('btnSaveForm')
+        .addEventListener('click', async function () {
+
+            const button = this;
+            const originalText = button.innerHTML;
+
+            button.disabled = true;
+            button.innerHTML = 'İmzalanıyor...';
+
+            const response =
+                await axios.post(
+                    '/form/save',
+                    {
+                        form_id:
+                            {{ $form->id ?? 0 }}, // Gerekirse değiştir
+
+                        answers:
+                            answers,
+
+                        subform_answers:
+                            subformAnswers,
+
+                        form_started_at:
+                            formStartedAt.toISOString(),
+
+                        form_completed_at:
+                            new Date().toISOString(),
+
+                        timezone:
+                            Intl.DateTimeFormat().resolvedOptions().timeZone,
+
+                        device_info:
+                            getDeviceInfo()
+                    }
+                )
+                .then(response => response.data)
+                .catch(() => ({
+                    status: false,
+                    message:
+                        'Kayıt sırasında hata oluştu.'
+                }));
+
+            if (!response.status)
+            {
+                button.disabled = false;
+                button.innerHTML = originalText;
+
+                showToast(
+                    'error',
+                    response.message
+                );
+
+                return;
+            }
 
             Swal.fire({
-                icon: 'warning',
-                title: 'Uyarı',
-                text: 'Lütfen bir cevap seçin.'
+                icon: 'success',
+                title: 'Başarılı',
+                text:
+                    response.message ||
+                    'Form başarıyla kaydedildi.'
+            }).then(() => {
+
+                window.location.href = '{{ route('form.index') }}';
+
             });
 
-            return;
-        }
-
-        // ----------------------------------------------
-        // Current Step
-        // ----------------------------------------------
-        const currentStep = currentContent.id;
-
-        // ----------------------------------------------
-        // All Contents
-        // ----------------------------------------------
-        const allContents = Array.from(
-            document.querySelectorAll('.bs-stepper-content .content')
-        );
-
-        // ----------------------------------------------
-        // Current Index
-        // ----------------------------------------------
-        const currentIndex = allContents.findIndex(content => {
-            return content.id === currentStep;
         });
 
-        // ----------------------------------------------
-        // Last Step Check
-        // ----------------------------------------------
-        const isLastStep = currentIndex === allContents.length - 1;
-
-        // ----------------------------------------------
-        // Last Question
-        // ----------------------------------------------
-        if (isLastStep) {
-
-            // ==========================================
-            // START MODAL HERE
-            // ==========================================
-            $('#finishModal').modal('show');
-
-            return;
-        }
-
-        // ----------------------------------------------
-        // Next Step
-        // ----------------------------------------------
-        stepper.next();
-
-    });
-
 });
-
-
-
-// --------------------------------------------------
-// Radio Change Event
-// --------------------------------------------------
-document.querySelectorAll('.radio-card-input').forEach(input => {
-
-    input.addEventListener('change', function () {
-
-        // ----------------------------------------------
-        // Current Content
-        // ----------------------------------------------
-        const currentContent = input.closest('.content');
-
-        // ----------------------------------------------
-        // Enable Next Button
-        // ----------------------------------------------
-        const nextButton = currentContent.querySelector('.btn-next');
-
-        if (nextButton) {
-            nextButton.disabled = false;
-        }
-
-        // ----------------------------------------------
-        // Current Question ID
-        // ----------------------------------------------
-        const contentId = currentContent.getAttribute('id');
-
-        // ----------------------------------------------
-        // Related Step
-        // ----------------------------------------------
-        const relatedStep = document.querySelector(
-            `.step[data-target="#${contentId}"]`
-        );
-
-        // ----------------------------------------------
-        // Subtitle Area
-        // ----------------------------------------------
-        const subtitle = relatedStep.querySelector('.answer-text');
-
-        // ----------------------------------------------
-        // Selected Text
-        // ----------------------------------------------
-        let answerText = '';
-
-        if (input.value === 'yes') {
-            answerText = 'Cevap verildi : Evet';
-        }
-
-        if (input.value === 'no') {
-            answerText = 'Cevap verildi : Hayır';
-        }
-
-        // ----------------------------------------------
-        // Update Subtitle
-        // ----------------------------------------------
-        subtitle.innerHTML = answerText;
-
-    });
-
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-});
-
 
 </script>
+
 @endsection

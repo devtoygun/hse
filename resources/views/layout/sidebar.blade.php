@@ -2,7 +2,7 @@
     $isDashboard = request()->routeIs('app.index');
     $isForms = request()->routeIs('form.index');
     $isFormArchive = request()->routeIs('form.archive');
-    $isFormManagement = request()->routeIs('form.create') || request()->routeIs('form.create-subform') || request()->routeIs('form.attach') || request()->routeIs('form.list');
+    $isFormManagement = request()->routeIs('form.create') || request()->routeIs('form.create-subform') || request()->routeIs('form.subforms') || request()->routeIs('form.subform-detail') || request()->routeIs('form.attach') || request()->routeIs('form.list');
     $isUserManagement = request()->routeIs('user.list-user') || request()->routeIs('user.list-admin') || request()->routeIs('user.create');
     $isFacilityManagement = request()->routeIs('facility.list-facility') || request()->routeIs('facility.create-unit') || request()->routeIs('facility.create-facility');
 @endphp
@@ -55,6 +55,7 @@
                 <ul class="menu-sub">
                     <li class="menu-item {{ request()->routeIs('form.create') ? 'active' : '' }}"><a href="{{ route('form.create') }}" class="menu-link {{ request()->routeIs('form.create') ? 'active' : '' }}"><div>{{ __('ui.new_form') }}</div></a></li>
                     <li class="menu-item {{ request()->routeIs('form.create-subform') ? 'active' : '' }}"><a href="{{ route('form.create-subform') }}" class="menu-link {{ request()->routeIs('form.create-subform') ? 'active' : '' }}"><div>{{ __('ui.new_subform') }}</div></a></li>
+                    <li class="menu-item {{ request()->routeIs('form.subforms') || request()->routeIs('form.subform-detail') ? 'active' : '' }}"><a href="{{ route('form.subforms') }}" class="menu-link {{ request()->routeIs('form.subforms') || request()->routeIs('form.subform-detail') ? 'active' : '' }}"><div>Alt Formlar</div></a></li>
                     <li class="menu-item {{ request()->routeIs('form.attach') ? 'active' : '' }}"><a href="{{ route('form.attach') }}" class="menu-link {{ request()->routeIs('form.attach') ? 'active' : '' }}"><div>{{ __('ui.form_attach') }}</div></a></li>
                     <li class="menu-item {{ request()->routeIs('form.list') ? 'active' : '' }}"><a href="{{ route('form.list') }}" class="menu-link {{ request()->routeIs('form.list') ? 'active' : '' }}"><div>{{ __('ui.all_forms') }}</div></a></li>
                 </ul>

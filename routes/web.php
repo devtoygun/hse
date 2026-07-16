@@ -24,14 +24,19 @@ Route::middleware(['auth', EnsureActiveSessionExists::class, TrackActiveSessionA
         ->group(function () {
             Route::get('/', 'index')->name('index');
 
-            Route::get('/{id}', 'form_start');
             Route::get('/archive', 'archive')->name('archive');
+            Route::get('/archive/{id}', 'archive_detail')->name('archive-detail');
             Route::get('/new-form', 'create')->name('create');
             Route::get('/new-subform', 'createSubform')->name('create-subform');
+            Route::get('/subforms', 'subforms')->name('subforms');
+            Route::get('/subform/{id}', 'subform_detail')->name('subform-detail');
             Route::get('/form-attachement', 'attach')->name('attach');
             Route::get('/list', 'list')->name('list');
+            Route::get('/{id}', 'form_start');
 
             Route::post('/create-form', 'create_form')->name('create-form');
+            Route::post('/create-subform', 'create_subform')->name('create-subform-store');
+            Route::post('/save', 'save')->name('save');
 
             Route::post('/set-status', 'set_status')->name('set_status');
             Route::post('/delete-form', 'delete_form')->name('delete-form');
@@ -40,6 +45,10 @@ Route::middleware(['auth', EnsureActiveSessionExists::class, TrackActiveSessionA
 
             Route::post('/save-question', 'save_question')->name('save-question');
             Route::post('/edit-question', 'edit_question')->name('edit-question');
+            Route::post('/save-subform-question', 'save_subform_question')->name('save-subform-question');
+            Route::post('/delete-subform-question', 'delete_subform_question')->name('delete-subform-question');
+            Route::post('/send-approval-code', 'send_approval_code')->name('send-approval-code');
+            Route::post('/verify-approval-code', 'verify_approval_code')->name('verify-approval-code');
         });
 
     Route::controller(UserController::class)
@@ -51,6 +60,9 @@ Route::middleware(['auth', EnsureActiveSessionExists::class, TrackActiveSessionA
             Route::get('/new-user', 'create')->name('create');
 
             Route::post('/change-password', 'change_password');
+            Route::post('/update-user', 'update_user');
+            Route::post('/set-status', 'set_status');
+            Route::post('/delete-user', 'delete_user');
         });
 
     Route::controller(FacilityController::class)

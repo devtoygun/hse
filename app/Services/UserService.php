@@ -33,6 +33,99 @@ class UserService
         return $user->update($data);
     }
 
+    public function updateUser(int $id, array $data, string $currentSessionPassword): array
+    {
+        $admin = Auth::user();
+
+        if (! $admin) {
+            return ['status' => false, 'message' => 'Oturum bulunamadi. Lutfen tekrar giris yapin.'];
+        }
+
+        if (! Hash::check($currentSessionPassword, $admin->password)) {
+            return ['status' => false, 'message' => 'Yonetici sifresi hatali!'];
+        }
+
+        $user = User::query()->findOrFail($id);
+        $user->update([
+            'firstname' => $data['firstname'],
+            'lastname' => $data['lastname'],
+            'email' => $data['email'],
+            'phone' => $data['phone'] ?? null,
+            'is_admin' => (bool) ($data['is_admin'] ?? false),
+        ]);
+
+        $this->writeUserLog($admin->id, $user->id, 'user_update', 'Yonetici tarafindan kullanici bilgileri guncellendi.');
+
+        return ['status' => true, 'message' => 'Kullanici guncellendi.', 'reload' => true];
+    }
+
+    public function setStatus(int $id, string $status, string $currentSessionPassword): array
+    {
+        $admin = Auth::user();
+
+        if (! $admin) {
+            return ['status' => false, 'message' => 'Oturum bulunamadi. Lutfen tekrar giris yapin.'];
+        }
+
+        if (! Hash::check($currentSessionPassword, $admin->password)) {
+            return ['status' => false, 'message' => 'Yonetici sifresi hatali!'];
+        }
+
+        if (! in_array($status, ['active', 'passive'], true)) {
+            return ['status' => false, 'message' => 'Gecersiz kullanici durumu.'];
+        }
+
+        $user = User::query()->findOrFail($id);
+
+        if ($admin->id === $user->id && $status !== 'active') {
+            return ['status' => false, 'message' => 'Kendi hesabinizi pasif yapamazsiniz.'];
+        }
+
+        $user->forceFill(['status' => $status])->save();
+
+        if ($status !== 'active') {
+            DB::table('active_sessions')
+                ->where('user_id', $user->id)
+                ->where('is_active', 1)
+                ->update([
+                    'is_active' => 0,
+                    'logged_out_at' => now(),
+                    'updated_at' => now(),
+                ]);
+        }
+
+        $this->writeUserLog($admin->id, $user->id, 'user_status_update', 'Kullanici durumu '.$status.' olarak guncellendi.');
+
+        return ['status' => true, 'message' => 'Kullanici durumu guncellendi.', 'reload' => true];
+    }
+
+    public function deleteUser(int $id, string $currentSessionPassword): array
+    {
+        $admin = Auth::user();
+
+        if (! $admin) {
+            return ['status' => false, 'message' => 'Oturum bulunamadi. Lutfen tekrar giris yapin.'];
+        }
+
+        if (! Hash::check($currentSessionPassword, $admin->password)) {
+            return ['status' => false, 'message' => 'Yonetici sifresi hatali!'];
+        }
+
+        $user = User::query()->findOrFail($id);
+
+        if ($admin->id === $user->id) {
+            return ['status' => false, 'message' => 'Kendi hesabinizi silemezsiniz.'];
+        }
+
+        DB::transaction(function () use ($admin, $user) {
+            DB::table('active_sessions')->where('user_id', $user->id)->delete();
+            $this->writeUserLog($admin->id, $user->id, 'user_delete', 'Yonetici tarafindan kullanici silindi.');
+            $user->delete();
+        });
+
+        return ['status' => true, 'message' => 'Kullanici silindi.', 'reload' => true];
+    }
+
     public function changePassword(int $id, string $currentSessionPassword): array
     {
         $admin = Auth::user();
@@ -104,5 +197,18 @@ class UserService
     {
         return Str::password(10, letters: true, numbers: true, symbols: true, spaces: false);
     }
-}
 
+    private function writeUserLog(int $adminId, int $targetUserId, string $action, string $description): void
+    {
+        DB::table('system_logs')->insert([
+            'admin_id' => $adminId,
+            'target_user_id' => $targetUserId,
+            'action' => $action,
+            'description' => $description,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+}

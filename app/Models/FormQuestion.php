@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FormQuestion extends Model
 {
@@ -21,6 +22,7 @@ class FormQuestion extends Model
         'question_order',
         'question_text',
         'approval_required',
+        'send_nofitication',
         'status',
     ];
 
@@ -34,6 +36,7 @@ class FormQuestion extends Model
         return [
             'question_order' => 'integer',
             'approval_required' => 'boolean',
+            'send_nofitication' => 'boolean',
             'status' => 'boolean',
         ];
     }
@@ -44,5 +47,10 @@ class FormQuestion extends Model
     public function form(): BelongsTo
     {
         return $this->belongsTo(Form::class, 'form_id', 'id');
+    }
+
+    public function archiveAnswers(): HasMany
+    {
+        return $this->hasMany(FormArchiveAnswer::class, 'form_question_id');
     }
 }
